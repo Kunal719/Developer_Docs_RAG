@@ -1,0 +1,13 @@
+langchain>=0.3.27
+langchain-community>=0.3.27
+langchain-openai>=0.3.28
+langchain-text-splitters>=0.3.9
+langchain-chroma>=0.2.5
+chromadb>=1.0.15
+openai>=1.99.0
+python-dotenv>=1.1.1
+tiktoken>=0.10.0
+pydantic>=2.11.7
+GitPython>=3.1.45
+tqdm>=4.67.1
+python-frontmatter
