@@ -112,22 +112,9 @@ developer-docs-rag/
 
 # Example
 
-```text
-You > How do I add a node?
+<img width="1060" height="851" alt="image" src="https://github.com/user-attachments/assets/c01c5f35-14ea-45a2-b237-9ac94165ffb7" />
 
-Assistant > You can add a node to a graph using the `addNode` method. For better type safety, use the `GraphNode` type utility or `State.Node` to type your node functions. Here's an example in TypeScript:
-
-```typescript
-import { StateGraph, GraphNode } from "@langchain/langgraph";
-
-const myNode: GraphNode<typeof State> = (state, config) => {
-  // node implementation
-  return { results: `Hello, ${state.input}!` };
-};
-
-const builder = new StateGraph(State)
-  .addNode("myNode", myNode);
-```
+<img width="1437" height="310" alt="image" src="https://github.com/user-attachments/assets/2e17d774-6f57-4d97-9f74-3a38b5089c14" />
 
 ---
 
