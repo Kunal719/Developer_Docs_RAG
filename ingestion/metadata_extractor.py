@@ -2,7 +2,7 @@ from langchain_core.documents import Document
 import frontmatter
 from pathlib import Path
 
-def extract_metadata(documents: list[Document]) -> list[Document]:
+def extract_metadata(documents: list[Document], docs_path: Path) -> list[Document]:
     """
     Enrich Langchain Documents with metadata like title, category, code presence, etc
 
@@ -19,6 +19,10 @@ def extract_metadata(documents: list[Document]) -> list[Document]:
 
         # Check if code is present
         doc.metadata["has_code"] = "```" in doc.page_content
+
+        # Store the source as a path relative to the documentation root
+        relative_source_path = Path(doc.metadata["source"]).relative_to(docs_path)
+        doc.metadata["source"] = relative_source_path.as_posix()
 
         # Assign category to document based on path
         doc_source = Path(doc.metadata["source"])

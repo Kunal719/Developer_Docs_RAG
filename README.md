@@ -1,8 +1,70 @@
 # Developer Docs RAG
 
-A Retrieval-Augmented Generation (RAG) project that answers developer questions using official documentation instead of relying solely on an LLM's internal knowledge.
+A production-inspired Retrieval-Augmented Generation (RAG) project that answers developer questions using **official documentation** instead of relying solely on an LLM's internal knowledge.
 
-This repository is designed as an **iterative learning project**, where each version introduces a new retrieval technique while preserving and improving the previous architecture. Rather than building multiple independent RAG projects, this repository evolves from a simple Dense RAG pipeline into a production-inspired developer documentation assistant.
+Unlike many RAG tutorials that stop after indexing a set of documents into a vector database, this repository is intentionally built as an **iterative engineering project**. Each version introduces one architectural improvement while preserving and extending the previous implementation, allowing the system to evolve from a simple Dense RAG pipeline into a production-oriented developer documentation assistant.
+
+---
+
+# Why This Project?
+
+Most RAG examples demonstrate the retrieval pipeline but assume the knowledge base is static.
+
+Real-world systems are different.
+
+Documentation changes continuously, repositories evolve, retrieval quality becomes increasingly important, and systems must be evaluated before introducing more advanced retrieval strategies.
+
+The goal of this repository is to explore that evolution step by step by implementing production-inspired improvements rather than building multiple disconnected RAG projects.
+
+Each version focuses on a single architectural enhancement while maintaining a clean, modular codebase.
+
+---
+
+# Current Implementation
+
+The project currently consists of two completed milestones.
+
+## ✅ Version 1 — Dense RAG
+
+Version 1 established the complete Dense RAG pipeline from scratch.
+
+Features include:
+
+* GitHub repository ingestion
+* Markdown / MDX parsing
+* Metadata extraction
+* Recursive document chunking
+* OpenAI embeddings (`text-embedding-3-small`)
+* Persistent Chroma vector database
+* Dense semantic retrieval
+* LCEL-based RAG pipeline
+* Interactive CLI
+
+---
+
+## ✅ Version 2 — Incremental Indexing
+
+Version 2 focuses on making the ingestion pipeline significantly more efficient.
+
+Instead of rebuilding the vector database whenever documentation changes, the application updates only the affected documents.
+
+Version 2 introduces:
+
+* Sparse checkout repository synchronization
+* SHA-256 document change detection
+* Metadata index for tracked documents
+* Detection of:
+
+  * Newly added documents
+  * Modified documents
+  * Deleted documents
+* Selective document loading
+* Selective vector deletion
+* Incremental embedding generation
+* Persistent Chroma updates
+* Automatic indexing skip when documentation has not changed
+
+The retrieval pipeline remains unchanged while the indexing pipeline becomes significantly more efficient.
 
 ---
 
@@ -10,71 +72,74 @@ This repository is designed as an **iterative learning project**, where each ver
 
 The knowledge source for this project is the official **LangGraph documentation** from the LangChain GitHub repository.
 
-During indexing, the application:
+The application performs two independent workflows.
 
-- Clones (or updates) the documentation repository from GitHub.
-- Parses Markdown/MDX documentation.
-- Extracts useful metadata.
-- Splits documents into semantic chunks.
-- Generates embeddings using OpenAI.
-- Stores embeddings in a persistent Chroma vector database.
-- Retrieves relevant documentation to answer user questions.
+## Indexing Pipeline
 
-The assistant only answers using the retrieved documentation and explicitly states when the documentation does not contain enough information.
-
----
-
-# Version 1 - Dense RAG
-
-The goal of Version 1 was **not** to build the most advanced RAG system.
-
-Instead, the objective was to build every stage of a Dense RAG pipeline from scratch while keeping the architecture modular, maintainable, and easy to extend.
-
-Version 1 implements:
-
-- GitHub repository ingestion
-- Markdown/MDX document parsing
-- Metadata extraction
-- Recursive document chunking
-- OpenAI embeddings (`text-embedding-3-small`)
-- Persistent Chroma vector database
-- Dense semantic retrieval
-- LCEL-based RAG pipeline
-- Interactive command-line interface (CLI)
-
----
-
-# Architecture
+The indexing pipeline keeps the local vector database synchronized with the latest documentation.
 
 ```text
-                    GitHub Repository
-                           │
-                           ▼
-                  Repository Loader
-                           │
-                           ▼
-                 Markdown Parser (MDX)
-                           │
-                           ▼
-                 Metadata Extraction
-                           │
-                           ▼
-                     Document Chunking
-                           │
-                           ▼
-                OpenAI Embedding Model
-                           │
-                           ▼
-               Chroma Vector Database
-                           │
-                           ▼
-                 Dense Retriever (Top-K)
-                           │
-                           ▼
-              Prompt + OpenAI Chat Model
-                           │
-                           ▼
-                    Generated Answer
+GitHub Repository
+        │
+        ▼
+Sparse Checkout Synchronization
+        │
+        ▼
+Repository Status
+        │
+ ┌──────┴─────────────┐
+ │                    │
+ │              Repository Updated
+ │                    │
+ │                    ▼
+ │           SHA-256 Change Detection
+ │                    │
+ │                    ▼
+ │        Delete Updated / Removed Vectors
+ │                    │
+ │                    ▼
+ │          Load Changed Documents
+ │                    │
+ │                    ▼
+ │          Metadata Extraction
+ │                    │
+ │                    ▼
+ │               Document Chunking
+ │                    │
+ │                    ▼
+ │          OpenAI Embedding Model
+ │                    │
+ │                    ▼
+ │      Persistent Chroma Vector Store
+ │
+ ▼
+Repository Unchanged
+        │
+        ▼
+Skip Indexing
+```
+
+---
+
+## Retrieval Pipeline
+
+```text
+User Question
+      │
+      ▼
+Dense Retriever
+      │
+      ▼
+Relevant Documentation
+      │
+      ▼
+Prompt Template
+      │
+      ▼
+OpenAI Chat Model
+      │
+      ▼
+Generated Answer
 ```
 
 ---
@@ -91,22 +156,39 @@ developer-docs-rag/
 ├── utils/
 ├── tests/
 ├── data/
+│   ├── chromadb/
+│   ├── index_metadata.json
+│   └── raw/
 │
 ├── requirements.txt
 ├── README.md
+├── main.py
 └── .env
 ```
 
 ---
 
+# Design Principles
+
+The project follows several design principles that make future versions easier to build.
+
+* Modular ingestion pipeline
+* Separation of indexing and retrieval
+* Persistent vector database
+* Incremental document synchronization
+* Version-by-version evolution
+* Production-inspired architecture over notebook prototypes
+
+---
+
 # Tech Stack
 
-- Python 3.12
-- LangChain
-- ChromaDB
-- OpenAI
-- GitPython
-- python-frontmatter
+* Python 3.12
+* LangChain
+* ChromaDB
+* OpenAI
+* GitPython
+* python-frontmatter
 
 ---
 
@@ -118,62 +200,18 @@ developer-docs-rag/
 
 ---
 
-# Limitations Observed in Version 1
+# Improvements Introduced in Version 2
 
-Building Version 1 helped establish a strong Dense RAG baseline while also exposing several retrieval limitations.
+Compared to Version 1, the indexing pipeline now:
 
-## 1. Full Reprocessing on Every Run
+* Avoids reparsing unchanged documentation
+* Avoids re-embedding unchanged documents
+* Detects added, modified and deleted documentation
+* Removes obsolete vectors before re-indexing
+* Updates only affected documents
+* Skips indexing completely when the documentation repository has not changed
 
-Every application startup currently:
-
-- Loads the repository
-- Parses every document
-- Extracts metadata
-- Recreates document chunks
-
-Although embeddings are reused from the persistent Chroma database, the ingestion pipeline still performs unnecessary preprocessing for unchanged documentation.
-
----
-
-## 2. Dense Retrieval Limitations
-
-Semantic search performs well for procedural questions but occasionally struggles with:
-
-- exact API names
-- class definitions
-- method lookups
-- highly technical terminology
-
-For example, queries about **StateGraph** may retrieve tutorial pages demonstrating its usage instead of the API documentation where it is introduced.
-
----
-
-## 3. Chunk-Level Retrieval
-
-Dense retrieval operates on individual chunks.
-
-In some cases, retrieved chunks begin inside code examples while the explanatory paragraphs appear in neighbouring chunks, resulting in incomplete context being sent to the LLM.
-
----
-
-# Why Version 2?
-
-The next milestone focuses on **Incremental Indexing**.
-
-Version 1 already avoids regenerating embeddings when a persistent Chroma collection exists.
-
-However, it still reparses and rechunks every document during startup.
-
-Version 2 will improve the indexing pipeline by:
-
-- Detecting newly added documentation.
-- Detecting modified documentation.
-- Re-embedding only changed chunks.
-- Reusing existing indexed documents.
-- Maintaining stable document/chunk identifiers.
-- Reducing startup time significantly.
-
-This improves indexing efficiency without changing the retrieval architecture introduced in Version 1.
+These improvements significantly reduce startup work while preserving the same retrieval behaviour.
 
 ---
 
@@ -181,37 +219,40 @@ This improves indexing efficiency without changing the retrieval architecture in
 
 ## ✅ Version 1 — Dense RAG
 
-- GitHub ingestion
-- Metadata extraction
-- Chunking
-- Dense retrieval
-- Persistent Chroma vector database
-- LCEL RAG pipeline
-- Interactive CLI
+* GitHub ingestion
+* Markdown parsing
+* Metadata extraction
+* Recursive chunking
+* Dense retrieval
+* Persistent Chroma vector database
+* LCEL RAG pipeline
+* Interactive CLI
 
 ---
 
-## 🚧 Version 2 — Incremental Indexing
+## ✅ Version 2 — Incremental Indexing
 
-- Detect new documents
-- Detect modified documents
-- Stable document IDs
-- Update only changed embeddings
-- Faster indexing
+* Sparse repository synchronization
+* SHA-256 document change detection
+* Metadata index
+* Selective document loading
+* Selective vector deletion
+* Incremental embedding updates
+* Skip indexing when documentation is unchanged
 
 ---
 
 ## ⬜ Version 3 — Hybrid Retrieval
 
-- BM25
-- Dense Retrieval
-- Reciprocal Rank Fusion (RRF)
+* BM25
+* Dense retrieval
+* Reciprocal Rank Fusion (RRF)
 
 ---
 
 ## ⬜ Version 4 — Cross-Encoder Reranking
 
-Improve ranking quality by reranking retrieved documents before generation.
+Improve retrieval quality by reranking retrieved documents before generation.
 
 ---
 
@@ -221,28 +262,28 @@ Retrieve larger parent documents while searching over smaller chunks to provide 
 
 ---
 
-## ⬜ Version 6 — Agentic RAG (LangGraph)
+## ⬜ Version 6 — Evaluation Framework
 
-Introduce intelligent retrieval strategies including:
+Evaluate retrieval and generation quality using:
 
-- Query rewriting
-- Multi-hop retrieval
-- Tool calling
-- Reflection
-- Retrieval planning
+* Recall@K
+* MRR
+* RAGAS
+* Faithfulness
+* Latency
+* Cost analysis
 
 ---
 
-## ⬜ Version 7 — Evaluation
+## ⬜ Version 7 — Agentic RAG (LangGraph)
 
-Measure system quality using:
+Introduce intelligent retrieval strategies including:
 
-- Recall@K
-- MRR
-- RAGAS
-- Latency
-- Cost
-- Faithfulness
+* Query rewriting
+* Multi-hop retrieval
+* Retrieval planning
+* Tool calling
+* Reflection
 
 ---
 
@@ -261,7 +302,7 @@ python -m venv .venv
 
 Activate it.
 
-Windows
+**Windows**
 
 ```bash
 .venv\Scripts\activate
@@ -289,12 +330,13 @@ python main.py
 
 # Future Improvements
 
-Beyond the planned roadmap, possible future enhancements include:
+Possible extensions beyond the current roadmap include:
 
-- Multiple documentation repositories
-- Web interface
-- Streaming responses
-- Conversation memory
-- Configuration management
-- Docker support
-- CI/CD pipeline
+* Support multiple documentation repositories
+* Background indexing
+* Automatic documentation versioning
+* Docker deployment
+* CI/CD pipeline
+* Web interface
+* Streaming responses
+* Conversation memory
