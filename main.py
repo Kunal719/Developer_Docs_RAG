@@ -1,35 +1,35 @@
 from dotenv import load_dotenv
-from pathlib import Path
 
 from app.llm import get_llm
-from ingestion.chunker import chunk_documents
-from ingestion.embedding_model import get_embedding_model
-from ingestion.github_loader import load_repository, RepositoryStatus
-from ingestion.markdown_parser import load_documents, load_selected_documents
+from pipeline.initialization import initialize_resources
+from pipeline.prepare_chunks import prepare_chunks
+from ingestion.chunker import chunk_documents, assign_chunk_id
+from ingestion.github_loader import RepositoryStatus
+from ingestion.markdown_parser import load_selected_documents
 from ingestion.metadata_extractor import extract_metadata
-from ingestion.vector_store import build_vector_store, delete_documents
+from ingestion.vector_store import delete_documents
 from ingestion.document_index import update_index_metadata, detect_changes, ChangeSet
+from ingestion.bm25_index import build_bm25_index, save_bm25_index, load_bm25_index
 from retrieval.rag_chain import build_rag_chain
-from retrieval.retriever import build_retriever
+from retrieval.dense_retriever import DenseRetriever
+from retrieval.bm25 import BM25Retriever
+from retrieval.hybrid_retriever import HybridRetriever
 
 
 # Configuration
-GITHUB_REPO_URL = "https://github.com/langchain-ai/docs.git"
-LOCAL_REPO_PATH =  Path("data/raw/docs")
-DOCUMENTATION_PATH = Path("data/raw/docs/src/oss/langgraph")
-
-PERSISTENT_DIRECTORY = Path("data/chromadb")
-COLLECTION_NAME = "langgraph_docs"
-INDEX_PATH = Path("data/index_metadata.json")
-
-CHUNK_SIZE = 1200
-CHUNK_OVERLAP = 200
-TOP_K = 4
-
-MODEL_NAME = "gpt-4.1-nano"
-MODEL_PROVIDER = "openai"
-
-REBUILD_INDEX = False
+from config import (
+    DOCUMENTATION_PATH,
+    INDEX_PATH,
+    BM25_PATH,
+    CHUNK_SIZE,
+    CHUNK_OVERLAP,
+    DENSE_TOP_K,
+    BM25_TOP_K,
+    HYBRID_TOP_K,
+    RRF_K,
+    MODEL_NAME,
+    MODEL_PROVIDER
+)
 
 def main() -> None:
     """
@@ -44,48 +44,29 @@ def main() -> None:
     print()
 
     try:
-        print("[1/11] Loading repository...")
-        _, repository_status = load_repository(GITHUB_REPO_URL, LOCAL_REPO_PATH)
-        print("Repository ready")
-
-        print("\n[2/11] Initializing embedding model...")
-        embedding_model = get_embedding_model()
-        print("Embedding model ready")
-
-        print("\n[3/11] Building vector store...")
-        vector_store = build_vector_store(
-            embedding_model=embedding_model,
-            persistent_dir=PERSISTENT_DIRECTORY,
-            collection_name=COLLECTION_NAME,
-            rebuild=REBUILD_INDEX,
-        )
-        print("Vector store ready")
+        repository_status, vector_store = initialize_resources()
 
         if repository_status is RepositoryStatus.CLONED:
-            print("\n[4/11] Loading documentation...")
-            documents = load_documents(DOCUMENTATION_PATH)
-            print(f"Loaded {len(documents)} documents")
+            chunks = prepare_chunks()
 
-            print("\n[5/11] Extracting metadata...")
-            documents = extract_metadata(documents, DOCUMENTATION_PATH)
-            print("Metadata extracted")
-
-            print("\n[6/11] Chunking documents...")
-            chunks = chunk_documents(documents, chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP)
-            print(f"Created {len(chunks)} chunks")
+            # Create bm25 index
+            print("\nCreating bm25 index...")
+            bm25_index = build_bm25_index(chunks, top_k=BM25_TOP_K)
+            save_bm25_index(bm25_index, BM25_PATH)
+            print("bm25 index created")
 
             # Add documents to vector store
-            print("\n[7/11] Adding documents to vector store...")
+            print("\nAdding documents to vector store...")
             vector_store.add_documents(chunks)
             print("Documents added to vector store")
 
             # Creating the metadata index
             change_set = ChangeSet(
-                         new={doc.metadata["source"] for doc in documents},
+                         new={chunk.metadata["source"] for chunk in chunks},
                          updated=set(),
                          deleted=set(),
                          has_changes=False)
-            print("\n[8/11] Updating metadata index...")
+            print("\nUpdating metadata index...")
             update_index_metadata(
                 index_path=INDEX_PATH,
                 change_set=change_set,
@@ -95,64 +76,78 @@ def main() -> None:
         
         elif repository_status is RepositoryStatus.UPDATED:
 
-            print("\n[4/11] Detecting documentation changes...")
+            print("\nDetecting documentation changes...")
             change_set = detect_changes(DOCUMENTATION_PATH, INDEX_PATH)
 
             if change_set.has_changes:
                 print("Detected documentation changes: "f"{len(change_set.new)} new, "f"{len(change_set.updated)} updated, "f"{len(change_set.deleted)} deleted.")
                 # Check for deleted documents first, then new and updated documents
                 if change_set.deleted or change_set.updated:
-                    print("\n[5/11] Deleting old documents from vector store")
+                    print("\nDeleting old documents from vector store")
                     sources_to_delete = change_set.deleted | change_set.updated
                     delete_documents(vector_store, sources_to_delete)
                     print("Old documents deleted from vector store")
             
                 if change_set.new or change_set.updated:
-                    print("\n[6/11] Loading and extracting metadata of new or updated documents...")
+                    print("\nLoading and extracting metadata of new or updated documents...")
                     new_and_updated_docs = change_set.new | change_set.updated
                     documents = load_selected_documents(new_and_updated_docs, DOCUMENTATION_PATH)
                     documents = extract_metadata(documents, DOCUMENTATION_PATH)
                     print(f"Loaded and extracted metadata of {len(documents)} new or updated documents")
 
-                    print("\n[7/11] Chunking documents and adding them to vector store...")
+                    print("\nChunking documents and adding them to vector store...")
                     chunks = chunk_documents(documents, chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP)
+                    assign_chunk_id(chunks)
                     print(f"Created {len(chunks)} chunks")
                     vector_store.add_documents(chunks)
                     print("New or updated documents added to vector store")
 
                 # Update the metadata index
-                print("\n[8/11] Updating metadata index...")
+                print("\nUpdating metadata index...")
                 update_index_metadata(
                     index_path=INDEX_PATH,
                     change_set=change_set,
                     docs_path=DOCUMENTATION_PATH,
                 )
                 print("Metadata index updated")
+
+                # Create BM25 index again
+                chunks = prepare_chunks()
+
+                print("\nCreating bm25 index...")
+                bm25_index = build_bm25_index(chunks, top_k=BM25_TOP_K)
+                save_bm25_index(bm25_index, BM25_PATH)
+                print("bm25 index created")
             
             else:
                 print("No changes in documentation detected")
+                print("\nLoading bm25 index...")
+                bm25_index = load_bm25_index(BM25_PATH)
+                print("bm25 index loaded")
 
         else:
             print("Repository already up to date. Skipping indexing")
+            print("\nLoading bm25 index...")
+            bm25_index = load_bm25_index(BM25_PATH)
+            print("bm25 index loaded")
 
 
-        print("\n[9/11] Building retriever...")
-        retriever = build_retriever(
-            vector_store=vector_store,
-            k=TOP_K,
-        )
+        print("\nBuilding retriever...")
+        dense_retriever = DenseRetriever(vector_store=vector_store, top_k=DENSE_TOP_K)
+        bm25_retriever = BM25Retriever(bm25_index=bm25_index)
+        hybrid_retriever = HybridRetriever(bm25_retriever=bm25_retriever, dense_retriever=dense_retriever, top_k=HYBRID_TOP_K, rrf_k=RRF_K)
         print("Retriever ready")
 
-        print("\n[10/11] Initializing LLM...")
+        print("\nInitializing LLM...")
         llm = get_llm(
             model_name=MODEL_NAME,
             model_provider=MODEL_PROVIDER,
         )
         print("LLM ready")
 
-        print("\n[11/11] Building RAG pipeline...")
+        print("\nBuilding RAG pipeline...")
         rag_chain = build_rag_chain(
-            retriever=retriever,
+            retriever=hybrid_retriever,
             llm=llm,
         )
         print("RAG pipeline ready")
@@ -177,11 +172,14 @@ def main() -> None:
             break
 
         try:
-            # retrieved_docs = retriever.invoke(question)
+            retrieved_docs = hybrid_retriever.retrieve(question)
 
             # print("\n" + "=" * 80)
             # print("Retrieved Documents")
             # print("=" * 80)
+            # for i, doc in enumerate(retrieved_docs, start=1):
+            #     print(f"{i}. {doc.metadata['source']}")
+            #     # print(doc.page_content[:300])
 
             # for i, doc in enumerate(retrieved_docs, start=1):
             #     print(f"\nDocument {i}")
