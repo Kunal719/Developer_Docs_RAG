@@ -15,6 +15,7 @@ __pycache__/
 # Chroma
 data/chromadb/
 data/index_metadata.json
+data/bm25
 
 # Cloned documentation
 data/raw/
@@ -27,3 +28,4 @@ testing.ipynb
 
 main_v1.py
 main_v2.py
+main_v3.py

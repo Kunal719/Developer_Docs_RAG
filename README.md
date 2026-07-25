@@ -18,11 +18,13 @@ The goal of this repository is to explore that evolution step by step by impleme
 
 Each version focuses on a single architectural enhancement while maintaining a clean, modular codebase.
 
+This makes it possible to evaluate the impact of every change independently rather than combining multiple techniques into a single iteration. The project evolves through measured engineering decisions supported by benchmarking rather than feature accumulation.
+
 ---
 
 # Current Implementation
 
-The project currently consists of two completed milestones.
+The project currently consists of three completed milestones.
 
 ## ✅ Version 1 — Dense RAG
 
@@ -65,6 +67,24 @@ Version 2 introduces:
 * Automatic indexing skip when documentation has not changed
 
 The retrieval pipeline remains unchanged while the indexing pipeline becomes significantly more efficient.
+
+---
+
+## ✅ Version 3 — Hybrid Retrieval
+
+Version 3 focuses on improving retrieval quality by combining dense semantic search with sparse lexical search.
+
+Instead of relying solely on vector similarity, the retrieval pipeline now fuses results from both retrieval strategies using Reciprocal Rank Fusion (RRF), improving recall for API names, function names, and exact developer terminology while preserving semantic search capabilities.
+
+Version 3 introduces:
+
+* Dense Retriever abstraction
+* BM25 lexical retrieval
+* Hybrid Retriever
+* Reciprocal Rank Fusion (RRF)
+* Unified retrieval interface
+* Improved retrieval for API-centric queries
+* Prompt refinement to encourage evidence-based synthesis across retrieved documentation
 
 ---
 
@@ -129,17 +149,25 @@ User Question
       ▼
 Dense Retriever
       │
-      ▼
-Relevant Documentation
-      │
-      ▼
-Prompt Template
-      │
-      ▼
-OpenAI Chat Model
-      │
-      ▼
-Generated Answer
+      ├─────────────┐
+      ▼             │
+BM25 Retriever      │
+      │             │
+      └──────┬──────┘
+             ▼
+   Reciprocal Rank Fusion
+             │
+             ▼
+ Retrieved Documentation
+             │
+             ▼
+ Prompt Template
+             │
+             ▼
+ OpenAI Chat Model
+             │
+             ▼
+ Generated Answer
 ```
 
 ---
@@ -189,6 +217,7 @@ The project follows several design principles that make future versions easier t
 * OpenAI
 * GitPython
 * python-frontmatter
+* rank-bm25
 
 ---
 
@@ -214,6 +243,20 @@ Compared to Version 1, the indexing pipeline now:
 * Skips indexing completely when the documentation repository has not changed
 
 These improvements significantly reduce startup work while preserving the same retrieval behaviour.
+
+---
+
+# Improvements Introduced in Version 3
+
+Compared to Version 2, the retrieval pipeline now:
+
+* Combines dense semantic retrieval with BM25 lexical retrieval
+* Uses Reciprocal Rank Fusion (RRF) to merge retrieval results
+* Improves retrieval of exact API names and developer terminology
+* Introduces a modular retrieval architecture for future retrieval strategies
+* Encourages synthesis across multiple retrieved documentation chunks while remaining grounded in the retrieved context
+
+These improvements increase retrieval robustness while maintaining the existing indexing pipeline introduced in Version 2.
 
 ---
 
@@ -244,7 +287,7 @@ These improvements significantly reduce startup work while preserving the same r
 
 ---
 
-## ⬜ Version 3 — Hybrid Retrieval
+## ✅ Version 3 — Hybrid Retrieval
 
 * BM25
 * Dense retrieval
@@ -258,13 +301,24 @@ Improve retrieval quality by reranking retrieved documents before generation.
 
 ---
 
-## ⬜ Version 5 — Parent Document Retrieval
+## ⬜ Version 5 — Documentation + API Knowledge Base
+
+Expand the knowledge base by combining official documentation with the LangGraph API source code.
+
+* Official documentation
+* API source code
+* Rich metadata
+* Multi-corpus retrieval
+
+---
+
+## ⬜ Version 6 — Parent Document Retrieval
 
 Retrieve larger parent documents while searching over smaller chunks to provide richer context.
 
 ---
 
-## ⬜ Version 6 — Evaluation Framework
+## ⬜ Version 7 — Evaluation Framework
 
 Evaluate retrieval and generation quality using:
 
@@ -277,7 +331,7 @@ Evaluate retrieval and generation quality using:
 
 ---
 
-## ⬜ Version 7 — Agentic RAG (LangGraph)
+## ⬜ Version 8 — Agentic RAG (LangGraph)
 
 Introduce intelligent retrieval strategies including:
 
