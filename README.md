@@ -223,9 +223,13 @@ The project follows several design principles that make future versions easier t
 
 # Example
 
-<img width="1060" height="851" alt="image" src="https://github.com/user-attachments/assets/c01c5f35-14ea-45a2-b237-9ac94165ffb7" />
+<img width="1437" height="902" alt="image" src="https://github.com/user-attachments/assets/025413ac-60b9-41c6-8599-b143258fb7dd" />
 
-<img width="1437" height="310" alt="image" src="https://github.com/user-attachments/assets/2e17d774-6f57-4d97-9f74-3a38b5089c14" />
+<img width="1442" height="472" alt="image" src="https://github.com/user-attachments/assets/90dcacca-4004-40d7-9c91-3f8784cce71e" />
+
+<img width="1452" height="772" alt="image" src="https://github.com/user-attachments/assets/56f2dc45-708e-44f9-bd5c-2befd6f0159f" />
+
+
 
 ---
 
