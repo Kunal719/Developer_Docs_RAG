@@ -1,22 +1,19 @@
 from retrieval.base import BaseRetriever
-from reranking.base_reranker import BaseReranker
 from evaluation.observer import PipelineObserver
 from langchain_core.language_models.chat_models import BaseChatModel
 from prompt.rag_prompt import rag_prompt
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnableLambda
+from langchain_core.runnables import RunnablePassthrough, RunnableLambda
 from langchain_core.output_parsers import StrOutputParser
 from utils.document_formatter import format_retrieved_context
-from utils.helper import calculate_estimated_cost
 from time import perf_counter
+from utils.helper import calculate_estimated_cost
 
-def build_rag_chain(
+def build_hybrid_rag_chain(
         retriever: BaseRetriever, 
-        reranker: BaseReranker, 
-        llm: BaseChatModel,  
+        llm: BaseChatModel, 
         prompt: ChatPromptTemplate = rag_prompt, 
-        observer: PipelineObserver | None = None
-        ):
+        observer: PipelineObserver | None = None):
     """
     Build the end-to-end Retrieval-Augmented Generation (RAG) chain.
 
@@ -29,29 +26,13 @@ def build_rag_chain(
         A runnable LCEL RAG chain.
     """
 
-    def retrieve_and_rerank(query: str):
-        """
-        Retrieve documents and rerank them based on the query.
-        """
-        documents = retriever.retrieve(query, observer)
-        reranked_documents = reranker.rerank(query, documents, observer)
-
-        return {"question": query, "context": reranked_documents}
-
-    retrieve_and_rerank_documents = RunnableLambda(retrieve_and_rerank)
-
-    format_documents = RunnableLambda(
-        lambda inputs: {
-            "question": inputs["question"],
-            "context": format_retrieved_context(inputs["context"])
-        }
-    )
+    retrieve_documents = RunnableLambda(lambda query: retriever.retrieve(query, observer))
+    format_documents = RunnableLambda(lambda docs: format_retrieved_context(docs))
 
     def invoke_llm(inputs):
-
         start_time = perf_counter()
         response = llm.invoke(inputs)
-        end_time = perf_counter()
+        end_time  = perf_counter()
 
         latency = (end_time - start_time)
 
@@ -72,8 +53,10 @@ def build_rag_chain(
         return response
 
     chain = (
-        retrieve_and_rerank_documents
-        | format_documents
+        {
+            "context":  retrieve_documents | format_documents,
+            "question": RunnablePassthrough(),
+        }
         | prompt
         | RunnableLambda(invoke_llm)
         | StrOutputParser()

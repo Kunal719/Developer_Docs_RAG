@@ -1,7 +1,10 @@
 from retrieval.base import BaseRetriever
 from retrieval.bm25 import BM25Retriever
 from retrieval.dense_retriever import DenseRetriever
+from evaluation.observer import PipelineObserver
+from evaluation.models import RetrievedDocument
 from langchain_core.documents import Document
+from time import perf_counter
 
 class HybridRetriever(BaseRetriever):
     def __init__(self, bm25_retriever: BM25Retriever, dense_retriever: DenseRetriever, top_k: int, rrf_k: int):
@@ -30,20 +33,32 @@ class HybridRetriever(BaseRetriever):
 
         return fused_docs
 
-    def retrieve(self, query: str) -> list[Document]:
+    def retrieve(self, query: str, observer: PipelineObserver | None = None) -> list[Document]:
         """
         Retrieve the most relevant documents using Dense Retriever and BM25 Retriever
 
         Args:
             query: Query string
+            observer: The pipeline observer which records the metrics
 
         Returns:
             List of retrieved documents
         """
-        dense_results = self._dense_retriever.retrieve(query)
-        bm25_results = self._bm25_index.retrieve(query)
 
+        dense_results = self._dense_retriever.retrieve(query, observer)
+        bm25_results = self._bm25_index.retrieve(query, observer)
+
+        start_time = perf_counter()
         fused_results = self._rrf([dense_results, bm25_results])
+        end_time = perf_counter()
+
+        if observer is not None:
+            observer_docs: list[RetrievedDocument] = []
+
+            for doc in fused_results:
+                observer_docs.append(RetrievedDocument(chunk_id=doc.metadata.get("chunk_id"), source=doc.metadata.get("source"), score=None))
+
+            observer.record_stage("RRF Fusion", (end_time - start_time), self._top_k, observer_docs)
 
         return fused_results
 

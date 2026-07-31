@@ -1,0 +1,142 @@
+[
+    {
+        "id": 1,
+        "category": "reasoning",
+        "intent": "workflow_design",
+        "difficulty": "hard",
+        "question": "How would you build a LangGraph workflow that pauses for human approval before executing a tool call and then resumes execution later?"
+    },
+    {
+        "id": 2,
+        "category": "reasoning",
+        "intent": "feature_integration",
+        "difficulty": "hard",
+        "question": "How do interrupts and checkpointers work together to enable human-in-the-loop workflows in LangGraph?"
+    },
+    {
+        "id": 3,
+        "category": "reasoning",
+        "intent": "multi_document",
+        "difficulty": "hard",
+        "question": "Explain how Send and reducers work together to implement a map-reduce pattern in LangGraph."
+    },
+    {
+        "id": 4,
+        "category": "comparison",
+        "intent": "compare_features",
+        "difficulty": "hard",
+        "question": "When should you use Command instead of conditional edges in LangGraph?"
+    },
+    {
+        "id": 5,
+        "category": "reasoning",
+        "intent": "architecture",
+        "difficulty": "hard",
+        "question": "Design a LangGraph workflow that performs parallel tool execution and merges the results safely into shared state."
+    },
+    {
+        "id": 6,
+        "category": "implementation",
+        "intent": "streaming",
+        "difficulty": "hard",
+        "question": "How does streaming interact with graph execution, and what information can be streamed at different stages of a LangGraph run?"
+    },
+    {
+        "id": 7,
+        "category": "comparison",
+        "intent": "compare_features",
+        "difficulty": "hard",
+        "question": "Compare StateGraph, Functional API, and entrypoint workflows. When is each approach most appropriate?"
+    },
+    {
+        "id": 8,
+        "category": "implementation",
+        "intent": "memory",
+        "difficulty": "hard",
+        "question": "Explain the role of checkpointers in persistent memory and recovery during LangGraph execution."
+    },
+    {
+        "id": 9,
+        "category": "reasoning",
+        "intent": "tool_execution",
+        "difficulty": "hard",
+        "question": "How does ToolNode simplify tool execution, and how does it interact with MessagesState in common agent workflows?"
+    },
+    {
+        "id": 10,
+        "category": "reasoning",
+        "intent": "graph_execution",
+        "difficulty": "hard",
+        "question": "Describe the complete lifecycle of a LangGraph execution from graph invocation to reaching END."
+    },
+    {
+        "id": 11,
+        "category": "implementation",
+        "intent": "subgraphs",
+        "difficulty": "hard",
+        "question": "How can subgraphs be used to organize complex LangGraph applications, and how is state shared between parent and child graphs?"
+    },
+    {
+        "id": 12,
+        "category": "comparison",
+        "intent": "execution_control",
+        "difficulty": "hard",
+        "question": "Compare Send, Command, and conditional edges. What problems does each solve in LangGraph?"
+    },
+    {
+        "id": 13,
+        "category": "reasoning",
+        "intent": "fault_tolerance",
+        "difficulty": "hard",
+        "question": "How would you design a fault-tolerant LangGraph workflow that can recover after interruption or failure without restarting from the beginning?"
+    },
+    {
+        "id": 14,
+        "category": "implementation",
+        "intent": "multi_agent",
+        "difficulty": "hard",
+        "question": "How can multiple agents be coordinated within a LangGraph workflow, and which graph features enable their communication?"
+    },
+    {
+        "id": 15,
+        "category": "reasoning",
+        "intent": "state_management",
+        "difficulty": "hard",
+        "question": "Why are reducers important when multiple nodes update the same state concurrently?"
+    },
+    {
+        "id": 16,
+        "category": "comparison",
+        "intent": "messages",
+        "difficulty": "hard",
+        "question": "How does add_messages differ from writing a custom reducer, and when should each be used?"
+    },
+    {
+        "id": 17,
+        "category": "reasoning",
+        "intent": "event_streaming",
+        "difficulty": "hard",
+        "question": "How do event streaming and execution streaming differ, and what debugging scenarios does each support in LangGraph?"
+    },
+    {
+        "id": 18,
+        "category": "implementation",
+        "intent": "agent_design",
+        "difficulty": "hard",
+        "question": "Design an agentic RAG workflow in LangGraph that can decide whether to retrieve, rewrite the query, or answer directly."
+    },
+    {
+        "id": 19,
+        "category": "reasoning",
+        "intent": "execution_flow",
+        "difficulty": "hard",
+        "question": "How can conditional edges, Command, and Send be combined within the same LangGraph application to create dynamic execution flows?"
+    },
+    {
+        "id": 20,
+        "category": "architecture",
+        "intent": "best_practices",
+        "difficulty": "hard",
+        "question": "What LangGraph features would you combine to build a production-ready, resilient, and observable AI workflow, and why?"
+    }
+]

@@ -22,9 +22,19 @@ This makes it possible to evaluate the impact of every change independently rath
 
 ---
 
+# Evaluation Philosophy
+
+Each architectural improvement in this project is evaluated before moving to the next iteration.
+
+Rather than assuming a new retrieval strategy improves the system, every version is benchmarked independently using the project's evaluation framework. This approach makes it possible to understand not only whether a change helps, but also where it helps and where it introduces new trade-offs.
+
+Detailed benchmark reports and experiment outputs are available in the `evaluation/` directory.
+
+---
+
 # Current Implementation
 
-The project currently consists of three completed milestones.
+The project currently consists of four completed milestones.
 
 ## ✅ Version 1 — Dense RAG
 
@@ -85,6 +95,25 @@ Version 3 introduces:
 * Unified retrieval interface
 * Improved retrieval for API-centric queries
 * Prompt refinement to encourage evidence-based synthesis across retrieved documentation
+
+---
+
+## ✅ Version 4 — Cross-Encoder Reranking & Evaluation
+
+Version 4 introduces a Cross-Encoder reranking stage to improve retrieval quality after Hybrid Retrieval.
+
+Rather than assuming this architectural change improves the system, the project now includes a dedicated evaluation framework for benchmarking retrieval strategies across different versions.
+
+Version 4 introduces:
+
+* Cross-Encoder document reranking
+* Modular evaluation framework
+* Experiment metadata tracking
+* Pipeline stage logging
+* Structured JSON experiment outputs
+* Benchmark question framework
+* Manual evaluation workflow
+* Benchmark reports and observations
 
 ---
 
@@ -158,6 +187,9 @@ BM25 Retriever      │
    Reciprocal Rank Fusion
              │
              ▼
+ Cross-Encoder Reranker
+             │
+             ▼
  Retrieved Documentation
              │
              ▼
@@ -172,6 +204,33 @@ BM25 Retriever      │
 
 ---
 
+## Evaluation Pipeline
+
+```text
+Benchmark Question
+        │
+        ▼
+Retrieval Pipeline
+        │
+        ▼
+Generation
+        │
+        ▼
+Capture Pipeline Stages
+        │
+        ▼
+Capture Generation Metrics
+        │
+        ▼
+Capture Overall Metrics
+        │
+        ▼
+Experiment JSON
+        │
+        ▼
+Evaluation using LLM with Human judgment
+```
+
 # Project Structure
 
 ```text
@@ -180,17 +239,21 @@ developer-docs-rag/
 ├── app/
 ├── ingestion/
 ├── retrieval/
+├── reranking/
+├── pipeline/
 ├── prompts/
-├── utils/
-├── tests/
+├── evaluation/
+│   └── results/
 ├── data/
 │   ├── chromadb/
-│   ├── index_metadata.json
+│   ├── bm25/
 │   └── raw/
+├── tests/
+├── utils/
 │
+├── main.py
 ├── requirements.txt
 ├── README.md
-├── main.py
 └── .env
 ```
 
@@ -218,6 +281,8 @@ The project follows several design principles that make future versions easier t
 * GitPython
 * python-frontmatter
 * rank-bm25
+* sentence-transformers
+* FlagEmbedding / BAAI BGE Reranker
 
 ---
 
@@ -262,6 +327,21 @@ These improvements increase retrieval robustness while maintaining the existing 
 
 ---
 
+# Improvements Introduced in Version 4
+
+Compared to Version 3, the retrieval pipeline now:
+
+* Adds Cross-Encoder reranking after Hybrid Retrieval.
+* Improves ranking of semantically relevant documentation chunks.
+* Introduces a modular evaluation framework for benchmarking retrieval strategies.
+* Captures experiment metadata and pipeline stage metrics.
+* Produces structured experiment JSON for reproducible analysis.
+* Enables systematic comparison between retrieval pipeline versions.
+
+These improvements make retrieval evaluation a first-class component of the project rather than relying solely on qualitative inspection.
+
+---
+
 # Project Roadmap
 
 ## ✅ Version 1 — Dense RAG
@@ -297,7 +377,7 @@ These improvements increase retrieval robustness while maintaining the existing 
 
 ---
 
-## ⬜ Version 4 — Cross-Encoder Reranking
+## ✅ V4 Cross Encoder + Evaluation
 
 Improve retrieval quality by reranking retrieved documents before generation.
 

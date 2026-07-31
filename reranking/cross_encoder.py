@@ -1,0 +1,41 @@
+from reranking.base_reranker import BaseReranker
+from langchain_core.documents import Document
+from sentence_transformers import CrossEncoder
+from evaluation.models import RetrievedDocument
+from evaluation.observer import PipelineObserver
+from time import perf_counter
+
+class CrossEncoderReranker(BaseReranker):
+    def __init__(self, rerank_model: str, top_k: int):
+        self._rerank_model = CrossEncoder(rerank_model)
+        self._top_k = top_k
+
+    def rerank(self, query: str, documents: list[Document], observer: PipelineObserver | None = None) -> list[Document]:
+        """
+        Given a query and a list of documents, rerank the documents based on the query using cross-encoder reranker
+        """
+        if not documents:
+            return []
+
+        pairs = [(query, doc.page_content) for doc in documents]
+
+        start_time = perf_counter()
+        scores = self._rerank_model.predict(pairs)
+
+        scored_docs = list(zip(documents, scores))
+
+        # Sort by score (descending)
+        scored_docs.sort(key=lambda x: x[1], reverse=True)
+
+        final_docs = [doc for doc, _ in scored_docs[:self._top_k]]
+        end_time = perf_counter()
+
+        if observer is not None:
+            observer_docs: list[RetrievedDocument] = []
+
+            for doc in final_docs:
+                observer_docs.append(RetrievedDocument(chunk_id=doc.metadata.get("chunk_id"), source=doc.metadata.get("source"), score=None))
+
+            observer.record_stage("Cross-Encoder Reranker", (end_time - start_time), self._top_k, observer_docs)
+
+        return final_docs
