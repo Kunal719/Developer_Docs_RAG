@@ -1,35 +1,3 @@
-# # Clone or Pull the repository based on if it is already cloned or needs to be pulled
-# from pathlib import Path
-
-# from git import Repo
-# from git.exc import GitCommandError, InvalidGitRepositoryError
-
-# def load_repository(repo_url: str, local_path: Path) -> Path:
-#     """
-#     Clone the repository if it doesn't exist locally; otherwise update it.
-#     Return the local repository path.
-
-#     Args:
-#         repo_url (str): The URL of the GitHub repository to clone or update.
-#         local_path (Path): The local path where the repository will be cloned or updated.
-
-#     Returns:
-#         Path: The local path of the cloned or updated repository.
-#     """
-#     local_path.parent.mkdir(parents=True, exist_ok=True)
-#     # If local_path/.git exists pull, otherwise clone
-#     if (local_path/".git").exists():
-#         repo = Repo(local_path)
-#         repo.remotes.origin.pull()
-#     else:
-#         print("Starting cloning...")
-#         try:
-#             Repo.clone_from(repo_url, local_path)
-#         except Exception as e:
-#             print(e)
-#         print("Git clone completed")
-#     return local_path  
-    
 from pathlib import Path
 from enum import Enum
 
@@ -44,7 +12,7 @@ class RepositoryStatus(Enum):
     UPDATED = "updated"
     UNCHANGED = "unchanged"
 
-def load_repository(repo_url: str, local_path: Path, branch: str = "main", check_for_updates: bool = True,) -> tuple[Path, RepositoryStatus]:
+def load_repository(repo_url: str, sparse_paths: list[str], local_path: Path, branch: str = "main", check_for_updates: bool = True,) -> tuple[Path, RepositoryStatus]:
     """
     Clone or update a GitHub repository using sparse checkout.
 
@@ -64,8 +32,6 @@ def load_repository(repo_url: str, local_path: Path, branch: str = "main", check
     Returns:
         A tuple containing the local repository path and the repository status.
     """
-
-    target_folder = "src/oss/langgraph"
 
     local_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -116,8 +82,8 @@ def load_repository(repo_url: str, local_path: Path, branch: str = "main", check
             no_checkout=True,
         )
 
-        repo.git.sparse_checkout("init", "--cone")
-        repo.git.sparse_checkout("set", target_folder)
+        repo.git.sparse_checkout("init", "--no-cone")
+        repo.git.sparse_checkout("set", *sparse_paths)
 
         repo.git.checkout(branch)
 

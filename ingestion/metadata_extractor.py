@@ -32,6 +32,12 @@ def extract_metadata(documents: list[Document], docs_path: Path) -> list[Documen
             doc.metadata["category"] = "frontend"
         else:
             doc.metadata["category"] = "general"
+
+        # Assign corpus value to document
+        doc.metadata["corpus"] = "documentation"
+
+    # Keep documents which has page_content
+    documents = [doc for doc in documents if doc.page_content.strip()]
    
     return documents
 

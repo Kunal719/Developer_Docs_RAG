@@ -11,7 +11,7 @@ class ChangeSet:
     has_changes: bool
 
 
-def discover_documents(docs_path: Path) -> list[Path]:
+def discover_documents(source_path: Path, glob_pattern: str) -> list[Path]:
     """
     Return a list of MDX files in the mentioned directory. We sort them for consistency
 
@@ -20,8 +20,10 @@ def discover_documents(docs_path: Path) -> list[Path]:
 
     Returns:
         A list of MDX files.
-    """
-    return sorted(list(docs_path.glob("**/*.mdx")))
+    """ 
+    
+    # Glob pattern can be - "**/*.mdx" or "**/*.py"
+    return sorted(list(source_path.glob(glob_pattern)))
 
 def compute_sha256(file_path: Path, chunk_size=65536) -> str:
     """
@@ -53,7 +55,7 @@ def load_index_metadata(index_path: Path) -> dict:
         index_path.write_text("{}", encoding="utf-8")
         return {}
 
-def detect_changes(docs_path: Path,  index_path: Path) -> ChangeSet:
+def detect_changes(source_path: Path,  index_path: Path, glob_pattern: str) -> ChangeSet:
     """
     Detect changes in the documentation directory and return a list of new, deleted, and updated files.
 
@@ -66,11 +68,12 @@ def detect_changes(docs_path: Path,  index_path: Path) -> ChangeSet:
     """
 
     changes_detected : bool = False
-    current_docs = discover_documents(docs_path)
+    
+    current_docs = discover_documents(source_path, glob_pattern)
 
     # Map relative path to full path
     current_files = {
-        doc.relative_to(docs_path).as_posix(): doc for doc in current_docs
+        doc.relative_to(source_path).as_posix(): doc for doc in current_docs
     }
 
     # Load current index metadata
@@ -96,26 +99,26 @@ def detect_changes(docs_path: Path,  index_path: Path) -> ChangeSet:
             
     return ChangeSet(new=new_files, deleted=deleted_files, updated=updated_files, has_changes=changes_detected)
 
-def update_index_metadata(index_path: Path, change_set: ChangeSet, docs_path: Path) -> None:
+def update_index_metadata(index_path: Path, change_set: ChangeSet, source_path: Path) -> None:
     """
     Update the metadata index to reflect the current indexed documents.
 
     Args:
         index_path: The path to the metadata index file.
         change_set: A ChangeSet object containing the new, deleted, and updated files.
-        docs_path: The path to the documentation directory.
+        source_path: The path to the documentation directory.
     """
 
     index_metadata = load_index_metadata(index_path)
 
     # Add new documents
     for relative_path in change_set.new:
-        full_path = docs_path / relative_path
+        full_path = source_path / relative_path
         index_metadata[relative_path] = compute_sha256(full_path)
     
     # Update existing documents
     for relative_path in change_set.updated:
-        full_path = docs_path / relative_path
+        full_path = source_path / relative_path
         index_metadata[relative_path] = compute_sha256(full_path)
     
     # Delete the documents

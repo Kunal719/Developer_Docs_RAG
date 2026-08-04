@@ -1,0 +1,7 @@
+from ingestion.github_loader import load_repository
+
+from config import GITHUB_CODE_REPO_URL, LOCAL_CODE_REPO_PATH, IMPLEMENTATION_SPARSE_PATHS, GITHUB_DOC_REPO_URL, LOCAL_DOC_REPO_PATH, DOCUMENTATION_SPARSE_PATHS
+
+_,_ = load_repository(repo_url=GITHUB_DOC_REPO_URL, local_path=LOCAL_DOC_REPO_PATH, sparse_paths=DOCUMENTATION_SPARSE_PATHS)
+
+# print(len(IMPLEMENTATION_SPARSE_PATHS))

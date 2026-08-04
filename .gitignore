@@ -14,11 +14,19 @@ __pycache__/
 
 # Chroma
 data/chromadb/
-data/index_metadata.json
 data/bm25
+
+# Indexed metadata
+data/index_metadata.json
+data/code_index_metadata.json
+data/doc_index_metadata.json
+data/API_ingestion_files.md
 
 # Cloned documentation
 data/raw/
+
+# v5 Evaluation for now
+evaluation/results/v5
 
 # OS
 .DS_Store
@@ -30,3 +38,4 @@ main_v1.py
 main_v2.py
 main_v3.py
 main_v4.py
+main_v5.py

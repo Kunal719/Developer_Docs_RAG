@@ -2,29 +2,103 @@ from pathlib import Path
 
 PROJECT_VERSION = "v3"
 
-GITHUB_REPO_URL = "https://github.com/langchain-ai/docs.git"
-LOCAL_REPO_PATH =  Path("data/raw/docs")
+GITHUB_DOC_REPO_URL = "https://github.com/langchain-ai/docs.git"
+LOCAL_DOC_REPO_PATH =  Path("data/raw/docs")
 DOCUMENTATION_PATH = Path("data/raw/docs/src/oss/langgraph")
 
-PERSISTENT_DIRECTORY = Path("data/chromadb")
+GITHUB_CODE_REPO_URL = "https://github.com/langchain-ai/langgraph.git"
+LOCAL_CODE_REPO_PATH = Path("data/raw/langgraph")
+IMPLEMENTATION_PATH = Path("data/raw/langgraph/libs")
+
+DOC_PERSISTENT_DIRECTORY = Path("data/chromadb/langgraph_docs")
+CODE_PERSISTENT_DIRECTORY = Path("data/chromadb/langgraph_code")
+DOC_COLLECTION_NAME = "langgraph_docs"
+CODE_COLLECTION_NAME = "langgraph_code"
+
 EMBEDDING_MODEL = "text-embedding-3-small"
-COLLECTION_NAME = "langgraph_docs"
-INDEX_PATH = Path("data/index_metadata.json")
-BM25_PATH = Path("data/bm25/bm25_index.pkl")
+
+DOC_INDEX_PATH = Path("data/doc_index_metadata.json")
+CODE_INDEX_PATH = Path("data/code_index_metadata.json")
+
+DOC_BM25_PATH = Path("data/bm25/bm25_docs_index.pkl")
+CODE_BM25_PATH = Path("data/bm25/bm25_code_index.pkl")
 
 CHUNK_SIZE = 1200
 CHUNK_OVERLAP = 200
 
-DENSE_TOP_K = 10
-BM25_TOP_K = 10
-HYBRID_TOP_K = 5
+DENSE_TOP_K = 20
+BM25_TOP_K = 20
+HYBRID_TOP_K = 25
 RRF_K = 60
 
 RERANKER_MODEL = "BAAI/bge-reranker-base"
 RERANK_CANDIDATES = 15
-RERANK_TOP_K = 5
+RERANK_TOP_K = 15
 
 MODEL_NAME = "gpt-4.1-nano"
 MODEL_PROVIDER = "openai"
 
 REBUILD_INDEX = False
+
+DOCUMENTATION_SPARSE_PATHS = [
+    "src/oss/langgraph",
+]
+
+IMPLEMENTATION_SPARSE_PATHS = [
+    # Graphs
+    "libs/langgraph/langgraph/graph/state.py",
+    "libs/langgraph/langgraph/graph/message.py",
+
+    # Functional API
+    "libs/langgraph/langgraph/func/__init__.py",
+
+    # Pregel
+    "libs/langgraph/langgraph/pregel/main.py",
+    "libs/langgraph/langgraph/pregel/_checkpoint.py",
+
+    # Checkpointing
+    "libs/checkpoint/langgraph/checkpoint/base/__init__.py",
+    "libs/checkpoint/langgraph/checkpoint/serde/base.py",
+    "libs/checkpoint/langgraph/checkpoint/serde/jsonplus.py",
+    "libs/checkpoint/langgraph/checkpoint/serde/encrypted.py",
+    "libs/checkpoint/langgraph/checkpoint/memory/__init__.py",
+    "libs/checkpoint-sqlite/langgraph/checkpoint/sqlite/__init__.py",
+    "libs/checkpoint-sqlite/langgraph/checkpoint/sqlite/aio.py",
+    "libs/checkpoint-postgres/langgraph/checkpoint/postgres/__init__.py",
+    "libs/checkpoint-postgres/langgraph/checkpoint/postgres/aio.py",
+
+    # Storage
+    "libs/langgraph/langgraph/managed/base.py",
+    "libs/checkpoint/langgraph/store/base/__init__.py",
+    "libs/checkpoint/langgraph/store/base/batch.py",
+    "libs/checkpoint/langgraph/store/base/embed.py",
+    "libs/checkpoint/langgraph/store/memory/__init__.py",
+    "libs/checkpoint-postgres/langgraph/store/postgres/base.py",
+    "libs/checkpoint-postgres/langgraph/store/postgres/aio.py",
+
+    # Types
+    "libs/langgraph/langgraph/types.py",
+
+    # Runtime
+    "libs/langgraph/langgraph/runtime.py",
+
+    # Config
+    "libs/langgraph/langgraph/config.py",
+
+    # Errors
+    "libs/langgraph/langgraph/errors.py",
+
+    # Channels
+    "libs/langgraph/langgraph/channels/base.py",
+    "libs/langgraph/langgraph/channels/topic.py",
+    "libs/langgraph/langgraph/channels/last_value.py",
+    "libs/langgraph/langgraph/channels/ephemeral_value.py",
+    "libs/langgraph/langgraph/channels/any_value.py",
+    "libs/langgraph/langgraph/channels/binop.py",
+
+    # Prebuilt / Agents
+    "libs/prebuilt/langgraph/prebuilt/tool_node.py",
+    "libs/prebuilt/langgraph/prebuilt/_tool_call_transformer.py",
+    "libs/prebuilt/langgraph/prebuilt/_tool_call_stream.py",
+    "libs/prebuilt/langgraph/prebuilt/interrupt.py",
+]

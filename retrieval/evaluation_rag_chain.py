@@ -33,46 +33,10 @@ def build_rag_chain(
         """
         Retrieve documents and rerank them based on the query.
         """
-        documents = retriever.retrieve(query)
-        reranked_documents = reranker.rerank(query, documents)
+        documents = retriever.retrieve(query, observer)
+        reranked_documents = reranker.rerank(query, documents, observer)
 
         return {"question": query, "context": reranked_documents}
-
-    # def retrieve_and_rerank(query: str):
-    #     documents = retriever.retrieve(query)
-
-    #     print("\n" + "=" * 80)
-    #     print("BEFORE RERANK")
-    #     print("=" * 80)
-
-    #     for i, doc in enumerate(documents):
-    #         print(f"\nDocument {i}")
-    #         print(doc.metadata["source"])
-
-    #         if "def attach_edge(" in doc.page_content:
-    #             print("Contains")
-    #         else:
-    #             print("Not contains")
-
-    #     reranked_documents = reranker.rerank(query, documents)
-
-    #     print("\n" + "=" * 80)
-    #     print("AFTER RERANK")
-    #     print("=" * 80)
-
-    #     for i, doc in enumerate(reranked_documents):
-    #         print(f"\nDocument {i}")
-    #         print(doc.metadata["source"])
-
-    #         if "def attach_edge(" in doc.page_content:
-    #             print("Contains")
-    #         else:
-    #             print("Not contains")
-
-    #     return {
-    #         "question": query,
-    #         "context": reranked_documents,
-    #     }
 
     retrieve_and_rerank_documents = RunnableLambda(retrieve_and_rerank)
 
@@ -82,19 +46,6 @@ def build_rag_chain(
             "context": format_retrieved_context(inputs["context"])
         }
     )
-
-    # def debug_prompt(messages):
-    #     print("\n" + "=" * 100)
-    #     print("PROMPT SENT TO LLM")
-    #     print("=" * 100)
-
-    #     for message in messages.messages:
-    #         print(f"\n[{message.type.upper()}]")
-    #         print(message.content)
-
-    #     print("=" * 100 + "\n")
-
-    #     return messages
 
     def invoke_llm(inputs):
 
@@ -124,7 +75,6 @@ def build_rag_chain(
         retrieve_and_rerank_documents
         | format_documents
         | prompt
-        # | RunnableLambda(debug_prompt)
         | RunnableLambda(invoke_llm)
         | StrOutputParser()
     )

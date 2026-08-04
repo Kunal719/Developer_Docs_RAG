@@ -1,5 +1,6 @@
 from abc import abstractmethod, ABC
 from langchain_core.documents import Document
+from evaluation.observer import PipelineObserver
 
 class BaseRetriever(ABC):
     """
@@ -7,7 +8,7 @@ class BaseRetriever(ABC):
     """
 
     @abstractmethod
-    def retrieve(self, query: str) -> list[Document]:
+    def retrieve(self, query: str, observer: PipelineObserver | None = None) -> list[Document]:
         """
         Retrieve the most relevant documents for given query
         

@@ -38,4 +38,6 @@ class CrossEncoderReranker(BaseReranker):
 
             observer.record_stage("Cross-Encoder Reranker", (end_time - start_time), self._top_k, observer_docs)
 
+        # for doc in final_docs:
+            # print(f"Corpus: {doc.metadata['corpus']} \n Source: {doc.metadata['source']}")
         return final_docs
