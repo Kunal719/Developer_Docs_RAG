@@ -34,7 +34,7 @@ Detailed benchmark reports and experiment outputs are available in the `evaluati
 
 # Current Implementation
 
-The project currently consists of four completed milestones.
+The project currently consists of five completed milestones.
 
 ## ✅ Version 1 — Dense RAG
 
@@ -117,9 +117,34 @@ Version 4 introduces:
 
 ---
 
+## ✅ Version 5 — Multi-Corpus Retrieval
+
+Version 5 expands the knowledge base beyond the official documentation by introducing multi-corpus retrieval.
+
+Instead of searching only the LangGraph documentation, the retrieval pipeline now combines evidence from multiple sources before reranking and generation.
+
+Version 5 introduces:
+
+* Official LangGraph documentation corpus
+* LangGraph API reference corpus
+* LangGraph implementation source code corpus
+* Unified multi-corpus retrieval
+* Cross-corpus reranking
+* Implementation-aware question answering
+* Support for deep runtime and source-level reasoning
+
+This enables the system to answer implementation-focused developer questions that cannot be answered reliably using documentation alone.
+
+---
+
 # Project Overview
 
-The knowledge source for this project is the official **LangGraph documentation** from the LangChain GitHub repository.
+The knowledge base for this project consists of two corpuses:
+
+* Official LangGraph documentation
+* Carefully selected LangGraph API Reference/implementation source code
+
+The retrieval pipeline searches across all corpora, combines the retrieved candidates, reranks them using a Cross-Encoder, and generates answers grounded in both documentation and implementation details.
 
 The application performs two independent workflows.
 
@@ -176,30 +201,29 @@ Skip Indexing
 User Question
       │
       ▼
-Dense Retriever
+Multi-Corpus Retrieval
       │
-      ├─────────────┐
-      ▼             │
-BM25 Retriever      │
-      │             │
-      └──────┬──────┘
-             ▼
-   Reciprocal Rank Fusion
-             │
-             ▼
- Cross-Encoder Reranker
-             │
-             ▼
- Retrieved Documentation
-             │
-             ▼
- Prompt Template
-             │
-             ▼
- OpenAI Chat Model
-             │
-             ▼
- Generated Answer
+ ┌────┼─────────────┐
+ │    │             │
+ ▼    ▼             ▼
+Documentation   API Reference   Implementation
+ │    │             │
+ └────┴─────────────┘
+        │
+        ▼
+Cross-Encoder Reranker
+        │
+        ▼
+Top Retrieved Context
+        │
+        ▼
+Prompt Template
+        │
+        ▼
+OpenAI Chat Model
+        │
+        ▼
+Generated Answer
 ```
 
 ---
@@ -342,6 +366,21 @@ These improvements make retrieval evaluation a first-class component of the proj
 
 ---
 
+# Improvements Introduced in Version 5
+
+Compared to Version 4, the retrieval pipeline now:
+
+* Introduces multi-corpus retrieval.
+* Indexes the LangGraph API reference.
+* Indexes the LangGraph implementation source code.
+* Retrieves evidence across documentation, API reference, and implementation.
+* Improves implementation-level question answering.
+* Enables source-code grounded explanations for internal runtime behaviour.
+
+These improvements significantly expand the knowledge available to the retrieval pipeline while preserving the retrieval architecture introduced in Version 4.
+
+---
+
 # Project Roadmap
 
 ## ✅ Version 1 — Dense RAG
@@ -383,7 +422,7 @@ Improve retrieval quality by reranking retrieved documents before generation.
 
 ---
 
-## ⬜ Version 5 — Documentation + API Knowledge Base
+## ✅ Version 5 — Multi-Corpus Retrieval
 
 Expand the knowledge base by combining official documentation with the LangGraph API source code.
 
@@ -465,6 +504,24 @@ python main.py
 ```
 
 ---
+
+# Version 5 Evaluation
+
+Version 5 was evaluated using approximately 60 challenging implementation-focused benchmark questions covering:
+
+* Pregel runtime
+* Scheduling
+* StateGraph
+* ToolNode
+* Interrupts
+* Checkpointing
+* Store
+* Subgraphs
+* Command
+* Send
+* Runtime debugging
+
+The evaluation showed that multi-corpus retrieval substantially improved implementation-level question answering. Remaining errors were primarily caused by LLM reasoning and code generation rather than retrieval quality.
 
 # Future Improvements
 
