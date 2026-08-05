@@ -6,6 +6,7 @@ from prompt.rag_prompt import rag_prompt
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableLambda
 from langchain_core.output_parsers import StrOutputParser
+from langchain_core.messages import AIMessage
 from utils.document_formatter import format_retrieved_context
 from utils.helper import calculate_estimated_cost
 from time import perf_counter
@@ -83,50 +84,83 @@ def build_rag_chain(
         }
     )
 
-    # def debug_prompt(messages):
-    #     print("\n" + "=" * 100)
-    #     print("PROMPT SENT TO LLM")
-    #     print("=" * 100)
+    def debug_prompt(messages):
+        print("\n" + "=" * 100)
+        print("PROMPT SENT TO LLM")
+        print("=" * 100)
 
-    #     for message in messages.messages:
-    #         print(f"\n[{message.type.upper()}]")
-    #         print(message.content)
+        for message in messages.messages:
+            print(f"\n[{message.type.upper()}]")
+            print(message.content)
 
-    #     print("=" * 100 + "\n")
+        print("=" * 100 + "\n")
 
-    #     return messages
+        return messages
 
-    def invoke_llm(inputs):
+    def invoke_llm(inputs) -> AIMessage:
+        return llm.invoke(inputs)
+    # def invoke_llm(inputs):
 
-        start_time = perf_counter()
-        response = llm.invoke(inputs)
-        end_time = perf_counter()
+    #     start_time = perf_counter()
+    #     response = llm.invoke(inputs)
+    #     end_time = perf_counter()
 
-        latency = (end_time - start_time)
+    #     latency = (end_time - start_time)
 
-        usage = response.usage_metadata
+    #     usage = response.usage_metadata
 
-        if observer is not None:
-            observer.record_generation(
-                answer=response.content,
-                prompt_tokens=usage["input_tokens"],
-                completion_tokens=usage["output_tokens"],
-                total_tokens=usage["total_tokens"],
-                estimated_cost=calculate_estimated_cost(
-                    input_tokens=usage["input_tokens"], 
-                    output_tokens=usage["output_tokens"]),
-                generation_latency=latency,
-            )
+    #     if observer is not None:
+    #         observer.record_generation(
+    #             answer=response.content,
+    #             prompt_tokens=usage["input_tokens"],
+    #             completion_tokens=usage["output_tokens"],
+    #             total_tokens=usage["total_tokens"],
+    #             estimated_cost=calculate_estimated_cost(
+    #                 input_tokens=usage["input_tokens"], 
+    #                 output_tokens=usage["output_tokens"]),
+    #             generation_latency=latency,
+    #         )
 
-        return response
+    #     return response
 
     chain = (
         retrieve_and_rerank_documents
         | format_documents
         | prompt
-        # | RunnableLambda(debug_prompt)
-        | RunnableLambda(invoke_llm)
-        | StrOutputParser()
+        | RunnableLambda(debug_prompt)
+        | llm
+        # | RunnableLambda(invoke_llm)
+        # | StrOutputParser()
     )
 
     return chain
+
+def invoke_chain(chain, question: str, observer: PipelineObserver | None = None):
+
+    start = perf_counter()
+    response: AIMessage = chain.invoke(question)
+    end = perf_counter()
+
+    latency = end - start
+
+    usage = response.usage_metadata
+
+    if observer is not None and usage is not None:
+        observer.record_generation(
+            answer=response.content,
+            prompt_tokens=usage["input_tokens"],
+            completion_tokens=usage["output_tokens"],
+            total_tokens=usage["total_tokens"],
+            estimated_cost=calculate_estimated_cost(
+                input_tokens=usage["input_tokens"],
+                output_tokens=usage["output_tokens"],
+            ),
+            generation_latency=latency,
+        )
+
+    return response.content
+
+def stream_chain(chain, question: str):
+    for chunk in chain.stream(question):
+        if chunk.content:
+            yield chunk.content

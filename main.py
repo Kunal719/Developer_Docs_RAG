@@ -11,6 +11,8 @@ from ingestion.metadata_extractor import extract_metadata
 from ingestion.python_loader import load_python_documents, load_selected_python_documents
 from ingestion.code_metadata_extractor import extract_code_metadata
 
+from retrieval.rag_chain import invoke_chain, stream_chain
+
 from config import (
     GITHUB_DOC_REPO_URL,
     GITHUB_CODE_REPO_URL,
@@ -147,8 +149,21 @@ def main() -> None:
             #     print(doc.page_content[:300])   # First 300 characters
             #     print("\n" + "-" * 80)
             
-            response = rag_chain.invoke(question)
-            print(f"\nAssistant > {response}")
+            # response = rag_chain.invoke(question)
+            # print(f"\nAssistant > {response}")
+
+            # response = invoke_chain(rag_chain, question, observer=None)
+            # print(f"\nAssistant > {response}")
+
+            print("\nAssistant > ", end="", flush=True)
+
+            for token in stream_chain(
+                rag_chain,
+                question,
+            ):
+                print(token, end="", flush=True)
+
+            print()
 
         except Exception as e:
             print(f"\nAssistant > Failed to process your request.\nError: {e}")
