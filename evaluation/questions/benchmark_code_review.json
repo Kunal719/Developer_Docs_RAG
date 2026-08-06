@@ -1,0 +1,448 @@
+[
+  {
+    "id": 1,
+    "category": "code_review",
+    "intent": "tool_execution",
+    "difficulty": "medium",
+    "question": "Review the following LangGraph workflow. The developer expects the assistant to repeatedly call tools until no more tool calls are required. Identify the design issues, explain why they occur, and recommend improvements.",
+    "code_snippet": "from langgraph.graph import StateGraph, START, END\nfrom langgraph.graph.message import MessagesState\nfrom langgraph.prebuilt import ToolNode\n\nbuilder = StateGraph(MessagesState)\n\nbuilder.add_node(\"assistant\", assistant)\nbuilder.add_node(\"tools\", ToolNode(tools))\n\nbuilder.add_edge(START, \"assistant\")\nbuilder.add_edge(\"assistant\", END)\n\ngraph = builder.compile()",
+    "expected_files": [
+      "prebuilt/langgraph/prebuilt/tool_node.py",
+      "langgraph/langgraph/graph/message.py",
+      "langgraph/langgraph/graph/state.py",
+      "graph-api.mdx",
+      "workflows-agents.mdx"
+    ],
+    "concepts": [
+      "ToolNode",
+      "MessagesState",
+      "conditional edges",
+      "tool execution",
+      "agent workflows"
+    ]
+  },
+  {
+    "id": 2,
+    "category": "code_review",
+    "intent": "graph_construction",
+    "difficulty": "medium",
+    "question": "Review this graph construction. The developer wants tool execution to occur only when the model requests a tool call. Explain whether the workflow satisfies that requirement and suggest improvements.",
+    "code_snippet": "builder = StateGraph(MessagesState)\n\nbuilder.add_node(\"assistant\", assistant)\nbuilder.add_node(\"tools\", ToolNode(tools))\n\nbuilder.add_edge(START, \"assistant\")\nbuilder.add_edge(\"assistant\", \"tools\")\nbuilder.add_edge(\"tools\", END)\n\ngraph = builder.compile()",
+    "expected_files": [
+      "graph-api.mdx",
+      "workflows-agents.mdx",
+      "prebuilt/langgraph/prebuilt/tool_node.py",
+      "langgraph/langgraph/graph/message.py"
+    ],
+    "concepts": [
+      "ToolNode",
+      "MessagesState",
+      "conditional edges",
+      "tool execution"
+    ]
+  },
+  {
+    "id": 3,
+    "category": "code_review",
+    "intent": "conditional_routing",
+    "difficulty": "hard",
+    "question": "Review the following workflow. The developer wants the assistant to either call tools or finish execution depending on the model response. Identify any architectural issues and explain how LangGraph provides a better solution.",
+    "code_snippet": "builder = StateGraph(MessagesState)\n\nbuilder.add_node(\"assistant\", assistant)\nbuilder.add_node(\"tools\", ToolNode(tools))\n\nbuilder.add_edge(START, \"assistant\")\nbuilder.add_edge(\"assistant\", \"tools\")\nbuilder.add_edge(\"assistant\", END)\nbuilder.add_edge(\"tools\", \"assistant\")\n\ngraph = builder.compile()",
+    "expected_files": [
+      "graph-api.mdx",
+      "workflows-agents.mdx",
+      "prebuilt/langgraph/prebuilt/tool_node.py",
+      "langgraph/langgraph/graph/message.py"
+    ],
+    "concepts": [
+      "conditional edges",
+      "ToolNode",
+      "MessagesState",
+      "tool execution",
+      "graph routing"
+    ]
+  },
+  {
+    "id": 4,
+    "category": "code_review",
+    "intent": "workflow_design",
+    "difficulty": "hard",
+    "question": "A developer wants to add a human approval step before every tool execution. Review the implementation below and explain why it does not meet the requirement. Recommend a more appropriate LangGraph design.",
+    "code_snippet": "builder = StateGraph(MessagesState)\n\nbuilder.add_node(\"assistant\", assistant)\nbuilder.add_node(\"approval\", approval_node)\nbuilder.add_node(\"tools\", ToolNode(tools))\n\nbuilder.add_edge(START, \"assistant\")\nbuilder.add_edge(\"assistant\", \"approval\")\nbuilder.add_edge(\"approval\", \"tools\")\nbuilder.add_edge(\"tools\", END)\n\ngraph = builder.compile()",
+    "expected_files": [
+      "interrupts.mdx",
+      "workflows-agents.mdx",
+      "graph-api.mdx",
+      "checkpointers.mdx",
+      "prebuilt/langgraph/prebuilt/tool_node.py"
+    ],
+    "concepts": [
+      "human-in-the-loop",
+      "interrupts",
+      "ToolNode",
+      "checkpointing",
+      "workflow design"
+    ]
+  },
+  {
+    "id": 5,
+    "category": "code_review",
+    "intent": "architecture_review",
+    "difficulty": "hard",
+    "question": "Review the following LangGraph architecture. The developer combined planning, tool execution, summarization, and final response generation into a single node. Evaluate this design from a maintainability, extensibility, and debugging perspective, and recommend improvements.",
+    "code_snippet": "def assistant(state: MessagesState):\n    plan = planner.invoke(state)\n    tool_result = execute_tools(plan)\n    summary = summarize(tool_result)\n    final_answer = model.invoke(summary)\n    return {\"messages\": [final_answer]}\n\nbuilder = StateGraph(MessagesState)\nbuilder.add_node(\"assistant\", assistant)\nbuilder.add_edge(START, \"assistant\")\nbuilder.add_edge(\"assistant\", END)\n\ngraph = builder.compile()",
+    "expected_files": [
+      "thinking-in-langgraph.mdx",
+      "application-structure.mdx",
+      "workflows-agents.mdx",
+      "graph-api.mdx",
+      "prebuilt/langgraph/prebuilt/tool_node.py"
+    ],
+    "concepts": [
+      "workflow design",
+      "graph composition",
+      "agent workflows",
+      "ToolNode",
+      "application architecture"
+    ]
+  },
+  {
+    "id": 6,
+    "category": "code_review",
+    "intent": "state_management",
+    "difficulty": "medium",
+    "question": "Review the following workflow. The developer expects both parallel branches to append their results to the shared state. Identify any issues related to state updates and explain how you would fix them.",
+    "code_snippet": "class State(TypedDict):\n    results: list[str]\n\nbuilder = StateGraph(State)\n\nbuilder.add_node(\"search_docs\", search_docs)\nbuilder.add_node(\"search_code\", search_code)\nbuilder.add_node(\"merge\", merge)\n\nbuilder.add_edge(START, \"search_docs\")\nbuilder.add_edge(START, \"search_code\")\nbuilder.add_edge(\"search_docs\", \"merge\")\nbuilder.add_edge(\"search_code\", \"merge\")\nbuilder.add_edge(\"merge\", END)",
+    "expected_files": [
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "errors/INVALID_CONCURRENT_GRAPH_UPDATE.mdx",
+      "langgraph/langgraph/graph/state.py"
+    ],
+    "concepts": [
+      "reducers",
+      "state management",
+      "parallel execution",
+      "concurrent state updates"
+    ]
+  },
+  {
+    "id": 7,
+    "category": "code_review",
+    "intent": "reducer_review",
+    "difficulty": "hard",
+    "question": "Review the reducer implementation below. The developer reports that parallel execution occasionally loses updates. Explain why this happens and recommend a more reliable implementation.",
+    "code_snippet": "class State(TypedDict):\n    messages: Annotated[list, lambda old, new: new]\n\nbuilder = StateGraph(State)\n\nbuilder.add_node(\"planner\", planner)\nbuilder.add_node(\"research\", research)\nbuilder.add_node(\"summarize\", summarize)",
+     "expected_files": [
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "errors/INVALID_CONCURRENT_GRAPH_UPDATE.mdx",
+      "langgraph/langgraph/graph/state.py",
+      "langgraph/langgraph/graph/message.py"
+    ],
+    "concepts": [
+      "reducers",
+      "add_messages",
+      "state management",
+      "parallel execution",
+      "concurrent state updates"
+    ]
+  },
+  {
+    "id": 8,
+    "category": "code_review",
+    "intent": "checkpointing",
+    "difficulty": "hard",
+    "question": "Review the following implementation. The developer expects interrupted executions to resume automatically after restarting the application. Determine whether the implementation satisfies that requirement and explain what is missing.",
+    "code_snippet": "builder = StateGraph(MessagesState)\n\nbuilder.add_node(\"assistant\", assistant)\nbuilder.add_node(\"tools\", ToolNode(tools))\n\nbuilder.add_edge(START, \"assistant\")\nbuilder.add_edge(\"assistant\", \"tools\")\nbuilder.add_edge(\"tools\", END)\n\ngraph = builder.compile()",
+    "expected_files": [
+      "checkpointers.mdx",
+      "interrupts.mdx",
+      "persistence.mdx",
+      "checkpoint/langgraph/checkpoint/base/__init__.py"
+    ],
+    "concepts": [
+      "checkpointing",
+      "interrupts",
+      "persistent execution",
+      "recovery"
+    ]
+  },
+  {
+    "id": 9,
+    "category": "code_review",
+    "intent": "interrupt_review",
+    "difficulty": "hard",
+    "question": "A developer wants to pause execution for human approval before continuing. Review the implementation below and determine whether it correctly supports human-in-the-loop execution across application restarts.",
+    "code_snippet": "def approval_node(state):\n    input(\"Approve tool execution? \")\n    return state\n\nbuilder = StateGraph(MessagesState)\nbuilder.add_node(\"approval\", approval_node)\nbuilder.add_node(\"tools\", ToolNode(tools))\n\nbuilder.add_edge(START, \"approval\")\nbuilder.add_edge(\"approval\", \"tools\")\nbuilder.add_edge(\"tools\", END)\n\ngraph = builder.compile()",
+    "expected_files": [
+      "interrupts.mdx",
+      "checkpointers.mdx",
+      "persistence.mdx",
+      "checkpoint/langgraph/checkpoint/base/__init__.py"
+    ],
+    "concepts": [
+      "interrupts",
+      "human-in-the-loop",
+      "checkpointing",
+      "persistent execution"
+    ]
+  },
+  {
+    "id": 10,
+    "category": "code_review",
+    "intent": "memory_review",
+    "difficulty": "hard",
+    "question": "Review the following implementation. The developer believes conversation history will automatically persist across multiple user sessions. Evaluate whether this assumption is correct and recommend a more appropriate memory strategy.",
+    "code_snippet": "builder = StateGraph(MessagesState)\n\nbuilder.add_node(\"assistant\", assistant)\n\nbuilder.add_edge(START, \"assistant\")\nbuilder.add_edge(\"assistant\", END)\n\ngraph = builder.compile()",
+    "expected_files": [
+      "add-memory.mdx",
+      "persistence.mdx",
+      "checkpointers.mdx",
+      "stores.mdx",
+      "checkpoint/langgraph/store/base/__init__.py",
+      "checkpoint/langgraph/checkpoint/base/__init__.py"
+    ],
+    "concepts": [
+      "persistent memory",
+      "checkpointing",
+      "stores",
+      "MessagesState",
+      "memory"
+    ]
+  },
+  {
+    "id": 11,
+    "category": "code_review",
+    "intent": "streaming_review",
+    "difficulty": "medium",
+    "question": "Review the following implementation. The developer expects the frontend to display intermediate reasoning and tool execution events while the graph is running. Explain whether the implementation satisfies that requirement and recommend improvements.",
+    "code_snippet": "graph = builder.compile()\n\nresult = graph.invoke(\n    {\"messages\": [HumanMessage(content=query)]},\n    config={\"configurable\": {\"thread_id\": \"1\"}}\n)\n\nreturn result",
+    "expected_files": [
+      "streaming.mdx",
+      "event-streaming.mdx",
+      "frontend/graph-execution.mdx"
+    ],
+    "concepts": [
+      "streaming",
+      "event streaming",
+      "tool execution",
+      "frontend integration"
+    ]
+  },
+  {
+    "id": 12,
+    "category": "code_review",
+    "intent": "multi_agent_review",
+    "difficulty": "hard",
+    "question": "Review the following multi-agent workflow. The developer expects the planner, researcher, and reviewer agents to collaborate effectively. Identify architectural weaknesses and recommend a better coordination strategy.",
+    "code_snippet": "builder = StateGraph(MessagesState)\n\nbuilder.add_node(\"planner\", planner)\nbuilder.add_node(\"researcher\", researcher)\nbuilder.add_node(\"reviewer\", reviewer)\n\nbuilder.add_edge(START, \"planner\")\nbuilder.add_edge(\"planner\", \"researcher\")\nbuilder.add_edge(\"researcher\", \"reviewer\")\nbuilder.add_edge(\"reviewer\", END)",
+     "expected_files": [
+      "workflows-agents.mdx",
+      "graph-api.mdx",
+      "use-subgraphs.mdx",
+      "langgraph/langgraph/types.py",
+      "langgraph/langgraph/graph/message.py"
+    ],
+    "concepts": [
+      "multi-agent",
+      "agent communication",
+      "workflow design",
+      "graph composition",
+      "MessagesState"
+    ]
+  },
+  {
+    "id": 13,
+    "category": "code_review",
+    "intent": "performance_review",
+    "difficulty": "hard",
+    "question": "Review the following workflow. The developer reports that execution time increases significantly as more retrieval tools are added. Explain the performance bottlenecks and suggest improvements using appropriate LangGraph features.",
+    "code_snippet": "def retrieve(state):\n    docs = docs_tool.invoke(state)\n    code = code_tool.invoke(state)\n    web = web_tool.invoke(state)\n    memory = memory_tool.invoke(state)\n    return {\"context\": [docs, code, web, memory]}\n\nbuilder.add_node(\"retrieve\", retrieve)",
+    "expected_files": [
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "pregel.mdx",
+      "langgraph/langgraph/types.py",
+      "langgraph/langgraph/graph/state.py"
+    ],
+    "concepts": [
+      "parallel execution",
+      "Send",
+      "reducers",
+      "workflow design",
+      "performance optimization"
+    ]
+  },
+  {
+    "id": 14,
+    "category": "code_review",
+    "intent": "parallel_execution",
+    "difficulty": "hard",
+    "question": "Review the following graph. The developer wants all retrieval operations to execute concurrently. Determine whether the workflow achieves that objective and explain how you would redesign it if necessary.",
+    "code_snippet": "builder.add_edge(START, \"retrieve_docs\")\nbuilder.add_edge(\"retrieve_docs\", \"retrieve_code\")\nbuilder.add_edge(\"retrieve_code\", \"retrieve_web\")\nbuilder.add_edge(\"retrieve_web\", \"generate\")\nbuilder.add_edge(\"generate\", END)",
+    "expected_files": [
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "pregel.mdx",
+      "langgraph/langgraph/types.py"
+    ],
+    "concepts": [
+      "parallel execution",
+      "Send",
+      "workflow design",
+      "graph routing"
+    ]
+  },
+  {
+    "id": 15,
+    "category": "code_review",
+    "intent": "architecture_review",
+    "difficulty": "very_hard",
+    "question": "Review the following production workflow. The developer wants a resilient enterprise AI system that supports streaming, human approval, checkpoint recovery, tool execution, and observability. Evaluate the architecture and recommend improvements for scalability, maintainability, and fault tolerance.",
+    "code_snippet": "builder = StateGraph(MessagesState)\n\nbuilder.add_node(\"assistant\", assistant)\nbuilder.add_node(\"tools\", ToolNode(tools))\n\nbuilder.add_edge(START, \"assistant\")\nbuilder.add_edge(\"assistant\", \"tools\")\nbuilder.add_edge(\"tools\", \"assistant\")\n\ngraph = builder.compile()",
+    "expected_files": [
+      "workflows-agents.mdx",
+      "interrupts.mdx",
+      "checkpointers.mdx",
+      "fault-tolerance.mdx",
+      "streaming.mdx",
+      "observability.mdx",
+      "persistence.mdx",
+      "prebuilt/langgraph/prebuilt/tool_node.py",
+      "langgraph/langgraph/pregel/main.py"
+    ],
+    "concepts": [
+      "agent workflows",
+      "ToolNode",
+      "human-in-the-loop",
+      "checkpointing",
+      "fault tolerance",
+      "streaming",
+      "observability",
+      "workflow design"
+    ]
+  },
+  {
+    "id": 16,
+    "category": "code_review",
+    "intent": "architecture_refactoring",
+    "difficulty": "hard",
+    "question": "You have been asked to review the following pull request before it is merged into production. The workflow currently works, but the development team reports that adding new features has become increasingly difficult. Review the architecture, identify maintainability issues, and recommend a refactoring strategy using LangGraph best practices.",
+    "code_snippet": "builder = StateGraph(MessagesState)\n\nbuilder.add_node(\"assistant\", assistant)\nbuilder.add_node(\"tools\", ToolNode(tools))\nbuilder.add_node(\"memory\", memory_node)\nbuilder.add_node(\"summarize\", summarize)\nbuilder.add_node(\"review\", review)\nbuilder.add_node(\"persist\", persist)\n\nbuilder.add_edge(START, \"assistant\")\nbuilder.add_edge(\"assistant\", \"tools\")\nbuilder.add_edge(\"tools\", \"memory\")\nbuilder.add_edge(\"memory\", \"summarize\")\nbuilder.add_edge(\"summarize\", \"review\")\nbuilder.add_edge(\"review\", \"persist\")\nbuilder.add_edge(\"persist\", END)",
+    "expected_files": [
+      "application-structure.mdx",
+      "thinking-in-langgraph.mdx",
+      "use-subgraphs.mdx",
+      "workflows-agents.mdx",
+      "graph-api.mdx",
+      "prebuilt/langgraph/prebuilt/tool_node.py"
+    ],
+    "concepts": [
+      "application architecture",
+      "graph composition",
+      "subgraphs",
+      "workflow design",
+      "ToolNode",
+      "modularity"
+    ]
+  },
+  {
+    "id": 17,
+    "category": "code_review",
+    "intent": "feature_extension",
+    "difficulty": "hard",
+    "question": "Review the following workflow. A new requirement states that every tool execution must require human approval, while preserving the ability to resume execution after server failures. Explain whether the current architecture can support this requirement with minimal changes and describe the modifications you would make.",
+    "code_snippet": "builder = StateGraph(MessagesState)\n\nbuilder.add_node(\"assistant\", assistant)\nbuilder.add_node(\"tools\", ToolNode(tools))\n\nbuilder.add_edge(START, \"assistant\")\nbuilder.add_edge(\"assistant\", \"tools\")\nbuilder.add_edge(\"tools\", END)\n\ngraph = builder.compile(checkpointer=memory)",
+    "expected_files": [
+      "interrupts.mdx",
+      "checkpointers.mdx",
+      "workflows-agents.mdx",
+      "prebuilt/langgraph/prebuilt/tool_node.py",
+      "checkpoint/langgraph/checkpoint/base/__init__.py"
+    ],
+    "concepts": [
+      "human-in-the-loop",
+      "interrupts",
+      "ToolNode",
+      "checkpointing",
+      "workflow design"
+    ]
+  },
+  {
+    "id": 18,
+    "category": "code_review",
+    "intent": "production_review",
+    "difficulty": "very_hard",
+    "question": "You are reviewing a pull request for a production AI assistant. The implementation passes all unit tests, but the engineering team is concerned about long-term scalability and maintainability. Review the architecture and explain what changes you would request before approving the pull request.",
+    "code_snippet": "def assistant(state):\n    docs = retrieve_docs(state)\n    code = retrieve_code(state)\n    web = retrieve_web(state)\n    result = llm.invoke(build_prompt(docs, code, web, state))\n    tool_result = execute_tools(result)\n    final = llm.invoke(tool_result)\n    save_memory(final)\n    return {\"messages\": [final]}\n\nbuilder = StateGraph(MessagesState)\nbuilder.add_node(\"assistant\", assistant)\nbuilder.add_edge(START, \"assistant\")\nbuilder.add_edge(\"assistant\", END)",
+    "expected_files": [
+      "thinking-in-langgraph.mdx",
+      "application-structure.mdx",
+      "workflows-agents.mdx",
+      "graph-api.mdx",
+      "prebuilt/langgraph/prebuilt/tool_node.py",
+      "stores.mdx",
+      "add-memory.mdx"
+    ],
+    "concepts": [
+      "application architecture",
+      "workflow design",
+      "graph composition",
+      "ToolNode",
+      "persistent memory",
+      "modularity"
+    ]
+  },
+  {
+    "id": 19,
+    "category": "code_review",
+    "intent": "fault_tolerance",
+    "difficulty": "very_hard",
+    "question": "Review the following architecture for a financial approval system. The workflow must guarantee that failed executions never result in duplicate tool execution after recovery. Evaluate whether the current implementation satisfies that requirement and explain how you would redesign it.",
+    "code_snippet": "builder = StateGraph(MessagesState)\n\nbuilder.add_node(\"assistant\", assistant)\nbuilder.add_node(\"payment\", payment_tool)\n\nbuilder.add_edge(START, \"assistant\")\nbuilder.add_edge(\"assistant\", \"payment\")\nbuilder.add_edge(\"payment\", END)\n\ngraph = builder.compile(checkpointer=memory)",
+     "expected_files": [
+      "fault-tolerance.mdx",
+      "interrupts.mdx",
+      "checkpointers.mdx",
+      "persistence.mdx",
+      "checkpoint/langgraph/checkpoint/base/__init__.py",
+      "langgraph/langgraph/pregel/_checkpoint.py"
+    ],
+    "concepts": [
+      "fault tolerance",
+      "checkpointing",
+      "interrupts",
+      "persistent execution",
+      "workflow design"
+    ]
+  },
+  {
+    "id": 20,
+    "category": "code_review",
+    "intent": "pr_review",
+    "difficulty": "very_hard",
+    "question": "You are the lead reviewer for this pull request. The workflow functions correctly, but your task is to determine whether it is ready for production deployment. Review the design from the perspectives of scalability, observability, fault tolerance, extensibility, debugging, and maintainability. State whether you would approve the pull request and justify your decision.",
+    "code_snippet": "builder = StateGraph(MessagesState)\n\nbuilder.add_node(\"assistant\", assistant)\nbuilder.add_node(\"retrieve\", retrieve)\nbuilder.add_node(\"tools\", ToolNode(tools))\nbuilder.add_node(\"summarize\", summarize)\n\nbuilder.add_edge(START, \"assistant\")\nbuilder.add_edge(\"assistant\", \"retrieve\")\nbuilder.add_edge(\"retrieve\", \"tools\")\nbuilder.add_edge(\"tools\", \"summarize\")\nbuilder.add_edge(\"summarize\", END)\n\ngraph = builder.compile()",
+    "expected_files": [
+      "thinking-in-langgraph.mdx",
+      "application-structure.mdx",
+      "workflows-agents.mdx",
+      "observability.mdx",
+      "fault-tolerance.mdx",
+      "streaming.mdx",
+      "checkpointers.mdx",
+      "prebuilt/langgraph/prebuilt/tool_node.py"
+    ],
+    "concepts": [
+      "application architecture",
+      "workflow design",
+      "agent workflows",
+      "ToolNode",
+      "observability",
+      "checkpointing",
+      "fault tolerance",
+      "modularity"
+    ]
+  }
+]

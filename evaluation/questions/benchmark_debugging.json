@@ -1,0 +1,290 @@
+[
+  {
+    "id": 1,
+    "intent": "tool_execution",
+    "difficulty": "easy",
+    "question": "The developer expects the assistant to repeatedly call tools until no further tool calls are required. Instead, the graph always returns immediately after the first LLM response. Identify the root cause and explain how you would fix the workflow.",
+    "code_snippet": "builder = StateGraph(MessagesState)\n\nbuilder.add_node(\"assistant\", assistant)\nbuilder.add_node(\"tools\", ToolNode(tools))\n\nbuilder.add_edge(START, \"assistant\")\nbuilder.add_edge(\"assistant\", END)\n\ngraph = builder.compile()",
+    "error": null,
+    "observed_behavior": "The assistant generates a response but never invokes any tools.",
+    "expected_behavior": "The assistant should invoke ToolNode whenever the model requests tool calls and continue execution until no more tool calls remain.",
+    "logs": "INFO Graph execution started.\nINFO Assistant node executed.\nINFO Graph execution finished.",
+    "expected_files": [
+      "workflows-agents.mdx",
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "prebuilt/langgraph/prebuilt/tool_node.py",
+      "langgraph/langgraph/graph/message.py"
+    ],
+    "concepts": [
+      "ToolNode",
+      "MessagesState",
+      "conditional edges",
+      "tool execution"
+    ],
+    "tags": [
+      "missing_edge",
+      "missing_tool_loop",
+      "graph_routing"
+    ]
+  },
+  {
+    "id": 2,
+    "intent": "interrupt_resume",
+    "difficulty": "medium",
+    "question": "A developer implemented human approval using interrupts. After restarting the application and attempting to resume execution, the graph starts from the beginning instead of resuming from the interruption point. Determine the most likely root cause.",
+    "code_snippet": "graph = builder.compile()\n\nresult = graph.invoke(inputs)\n\n# Later...\ngraph.invoke(Command(resume=True), config=config)",
+    "error": "ValueError: No checkpointer configured.",
+    "observed_behavior": "Execution always starts from the START node after a restart.",
+    "expected_behavior": "Execution should resume from the interrupt location.",
+    "logs": "INFO Interrupt requested.\nERROR No checkpoint found.\nINFO Starting execution from START.",
+    "expected_files": [
+      "interrupts.mdx",
+      "checkpointers.mdx",
+      "persistence.mdx",
+      "errors/MISSING_CHECKPOINTER.mdx",
+      "checkpoint/langgraph/checkpoint/base/__init__.py"
+    ],
+    "concepts": [
+      "interrupts",
+      "checkpointing",
+      "persistent execution",
+      "Command"
+    ],
+    "tags": [
+      "missing_checkpointer",
+      "resume_failure",
+      "interrupt_resume"
+    ]
+  },
+  {
+    "id": 3,
+    "intent": "checkpointing",
+    "difficulty": "medium",
+    "question": "The workflow successfully saves checkpoints during execution, but every user shares the same execution history. Review the implementation and determine why checkpoint data is being reused across unrelated conversations.",
+    "code_snippet": "graph.invoke(inputs)",
+    "error": null,
+    "observed_behavior": "Different users resume previous conversations unexpectedly.",
+    "expected_behavior": "Each user session should maintain an independent execution history.",
+    "logs": "INFO Loaded checkpoint.\nINFO thread_id=None\nINFO Continuing previous execution.",
+    "expected_files": [
+      "checkpointers.mdx",
+      "persistence.mdx",
+      "graph-api.mdx",
+      "checkpoint/langgraph/checkpoint/base/__init__.py"
+    ],
+    "concepts": [
+      "checkpointing",
+      "thread_id",
+      "persistent execution",
+      "configuration"
+    ],
+    "tags": [
+      "missing_thread_id",
+      "checkpoint_reuse",
+      "session_isolation"
+    ]
+  },
+  {
+    "id": 4,
+    "intent": "parallel_state",
+    "difficulty": "hard",
+    "question": "The developer executes two retrieval branches in parallel. Sometimes one branch's results disappear from the final state. Analyze the debugging information below and identify the underlying architectural issue.",
+    "code_snippet": "class State(TypedDict):\n    documents: list[str]\n\nbuilder.add_edge(START, \"retrieve_docs\")\nbuilder.add_edge(START, \"retrieve_code\")",
+    "error": null,
+    "observed_behavior": "The final state occasionally contains only documentation results or only implementation results.",
+    "expected_behavior": "The final state should contain results from both retrieval branches.",
+    "logs": "INFO retrieve_docs completed.\nINFO retrieve_code completed.\nWARNING State overwrite detected.",
+    "expected_files": [
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "errors/INVALID_CONCURRENT_GRAPH_UPDATE.mdx",
+      "langgraph/langgraph/graph/state.py"
+    ],
+    "concepts": [
+      "reducers",
+      "parallel execution",
+      "state management",
+      "concurrent state updates"
+    ],
+    "tags": [
+      "missing_reducer",
+      "parallel_state_update",
+      "state_overwrite"
+    ]
+  },
+  {
+    "id": 5,
+    "intent": "streaming",
+    "difficulty": "hard",
+    "question": "The frontend team reports that users receive the final answer only after the entire workflow completes. They expected intermediate graph updates and tool execution events to appear during execution. Review the implementation and determine why streaming is not working.",
+    "code_snippet": "result = graph.invoke(inputs, config=config)\nreturn result",
+    "error": null,
+    "observed_behavior": "No intermediate events are delivered to the client.",
+    "expected_behavior": "The client should receive streamed graph events throughout execution.",
+    "logs": "INFO Graph execution started.\nINFO Tool execution completed.\nINFO Response returned.",
+    "expected_files": [
+      "streaming.mdx",
+      "event-streaming.mdx",
+      "frontend/graph-execution.mdx"
+    ],
+    "concepts": [
+      "streaming",
+      "event streaming",
+      "graph execution",
+      "frontend integration"
+    ],
+    "tags": [
+      "invoke_instead_of_stream",
+      "missing_streaming",
+      "frontend_updates"
+    ]
+  },
+  {
+    "id": 6,
+    "intent": "multi_agent_deadlock",
+    "difficulty": "very_hard",
+    "question": "A production multi-agent workflow occasionally hangs indefinitely. Each agent waits for another agent to complete before continuing, and no exception is raised. Review the workflow and determine the most likely architectural cause. Recommend how you would redesign the workflow.",
+    "code_snippet": "builder = StateGraph(MessagesState)\n\nbuilder.add_node(\"planner\", planner)\nbuilder.add_node(\"researcher\", researcher)\nbuilder.add_node(\"reviewer\", reviewer)\n\nbuilder.add_edge(START, \"planner\")\nbuilder.add_edge(\"planner\", \"researcher\")\nbuilder.add_edge(\"researcher\", \"planner\")\nbuilder.add_edge(\"planner\", \"reviewer\")\n\ngraph = builder.compile()",
+    "error": null,
+    "observed_behavior": "Execution never reaches the END node and no final response is produced.",
+    "expected_behavior": "The workflow should complete successfully after all agents finish their work.",
+    "logs": "INFO Planner executed.\nINFO Researcher executed.\nINFO Planner executed.\nINFO Researcher executed.\nINFO Planner executed...",
+    "expected_files": [
+      "graph-api.mdx",
+      "workflows-agents.mdx",
+      "errors/GRAPH_RECURSION_LIMIT.mdx",
+      "langgraph/langgraph/pregel/main.py"
+    ],
+    "concepts": [
+      "graph execution",
+      "multi-agent",
+      "conditional edges",
+      "workflow design"
+    ],
+    "tags": [
+      "infinite_loop",
+      "cyclic_graph",
+      "missing_exit_condition"
+    ]
+  },
+  {
+    "id": 7,
+    "intent": "duplicate_execution",
+    "difficulty": "very_hard",
+    "question": "Following a server restart, users report that the same external payment API is called twice even though the graph resumes successfully. Analyze the scenario and determine the architectural issue that could cause duplicate execution.",
+    "code_snippet": "builder.add_node(\"payment\", payment_tool)\n\nbuilder.add_edge(\"assistant\", \"payment\")\nbuilder.add_edge(\"payment\", END)\n\ngraph = builder.compile(checkpointer=memory)",
+    "error": null,
+    "observed_behavior": "The payment provider receives duplicate payment requests after workflow recovery.",
+    "expected_behavior": "External side effects should never execute twice after recovering from a checkpoint.",
+    "logs": "INFO Loaded checkpoint.\nINFO Executing payment node.\nINFO Payment completed.\nINFO Workflow resumed.\nINFO Executing payment node.",
+    "expected_files": [
+      "fault-tolerance.mdx",
+      "interrupts.mdx",
+      "checkpointers.mdx",
+      "checkpoint/langgraph/checkpoint/base/__init__.py",
+      "langgraph/langgraph/pregel/_checkpoint.py"
+    ],
+    "concepts": [
+      "fault tolerance",
+      "checkpointing",
+      "interrupts",
+      "workflow design",
+      "external side effects"
+    ],
+    "tags": [
+      "duplicate_execution",
+      "non_idempotent_side_effect",
+      "recovery_semantics"
+    ]
+  },
+  {
+    "id": 8,
+    "intent": "memory_growth",
+    "difficulty": "very_hard",
+    "question": "A long-running LangGraph application becomes progressively slower after several hours of execution. Memory consumption continuously increases even though completed conversations should no longer affect active workflows. Review the symptoms and identify likely architectural causes.",
+    "code_snippet": "class State(MessagesState):\n    documents: list[str]\n    intermediate_results: list\n    tool_outputs: list\n    summaries: list",
+    "error": null,
+    "observed_behavior": "Memory usage grows continuously while throughput decreases.",
+    "expected_behavior": "Completed workflows should release unnecessary state and maintain stable memory usage.",
+    "logs": "INFO Active conversations: 18\nINFO Memory usage: 1.2 GB\nINFO Memory usage: 2.6 GB\nINFO Memory usage: 4.1 GB",
+    "expected_files": [
+      "add-memory.mdx",
+      "stores.mdx",
+      "thinking-in-langgraph.mdx",
+      "application-structure.mdx",
+      "langgraph/langgraph/graph/state.py"
+    ],
+    "concepts": [
+      "state management",
+      "persistent memory",
+      "stores",
+      "MessagesState",
+      "application architecture"
+    ],
+    "tags": [
+      "unbounded_state_growth",
+      "memory_leak",
+      "large_graph_state"
+    ]
+  },
+  {
+    "id": 9,
+    "intent": "routing_loop",
+    "difficulty": "very_hard",
+    "question": "The workflow occasionally enters an infinite execution loop after tool execution completes. Review the implementation and explain which routing decisions are most likely responsible for the behavior.",
+    "code_snippet": "builder.add_edge(\"assistant\", \"tools\")\nbuilder.add_edge(\"tools\", \"assistant\")\n\n# assistant decides next node",
+    "error": null,
+    "observed_behavior": "The graph repeatedly alternates between the assistant and tool nodes without terminating.",
+    "expected_behavior": "The workflow should terminate once no additional tool calls are required.",
+    "logs": "INFO Assistant executed.\nINFO ToolNode executed.\nINFO Assistant executed.\nINFO ToolNode executed...\nWARNING Maximum recursion depth exceeded.",
+    "expected_files": [
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "workflows-agents.mdx",
+      "errors/GRAPH_RECURSION_LIMIT.mdx",
+      "prebuilt/langgraph/prebuilt/tool_node.py",
+      "langgraph/langgraph/graph/message.py"
+    ],
+    "concepts": [
+      "conditional edges",
+      "tool execution",
+      "ToolNode",
+      "MessagesState",
+      "graph routing"
+    ],
+    "tags": [
+      "routing_loop",
+      "missing_termination_condition",
+      "graph_recursion_limit"
+    ]
+  },
+  {
+    "id": 10,
+    "intent": "retry_storm",
+    "difficulty": "very_hard",
+    "question": "A production deployment experiences a sudden spike in external API traffic after a temporary service outage. Investigation reveals that thousands of failed tool executions are repeatedly retried at the same time. Analyze the debugging information and recommend a more resilient workflow design.",
+    "code_snippet": "def tool_node(state):\n    return external_api.invoke(state)\n\nbuilder.add_node(\"tool\", tool_node)\n\nbuilder.add_edge(\"assistant\", \"tool\")\nbuilder.add_edge(\"tool\", \"assistant\")",
+    "error": "HTTP 503 Service Unavailable",
+    "observed_behavior": "Every failed request is immediately retried, overwhelming the external service.",
+    "expected_behavior": "Retries should be controlled, limited, and resilient to temporary outages.",
+    "logs": "ERROR HTTP 503\nINFO Retrying...\nERROR HTTP 503\nINFO Retrying...\nERROR HTTP 503\nINFO Retrying...",
+    "expected_files": [
+      "fault-tolerance.mdx",
+      "workflows-agents.mdx",
+      "graph-api.mdx",
+      "prebuilt/langgraph/prebuilt/tool_node.py"
+    ],
+    "concepts": [
+      "fault tolerance",
+      "tool execution",
+      "workflow design",
+      "retry strategy"
+    ],
+    "tags": [
+      "retry_storm",
+      "service_outage",
+      "uncontrolled_retries"
+    ]
+  }
+]

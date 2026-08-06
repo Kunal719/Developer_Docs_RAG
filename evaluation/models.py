@@ -1,6 +1,9 @@
 from dataclasses import dataclass
 from typing import Optional
 from datetime import datetime
+from typing import Literal
+
+from evaluation.judge_models import JudgeEvaluation
 
 @dataclass
 class BenchmarkQuestion:
@@ -9,12 +12,18 @@ class BenchmarkQuestion:
     intent: str
     difficulty: str
     question: str
+    expected_files: list[str]
+    expected_concepts: list[str]
+    tags: list[str]
 
 @dataclass
 class RetrievedDocument:
     chunk_id: str
     source: str
-    score: Optional[float] = None
+    document_type: Literal["documentation", "implementation"]
+    retriever_score: float
+    reranker_score: Optional[float] = None
+    rank: Optional[int] = None
 
 @dataclass
 class PipelineStage:
@@ -28,7 +37,9 @@ class ExperimentMetadata:
     version: str
     timestamp: datetime
     embedding_model: str
+    llm_provider: str
     llm: str
+    temperature: float
     chunk_size: int
     chunk_overlap: int
     dense_top_k: int
@@ -37,10 +48,12 @@ class ExperimentMetadata:
     rrf_k: int
     reranker_top_k: Optional[int] = None
     reranker_name: Optional[str] = None
+    judge_model: Optional[str] = None
 
 @dataclass
 class GenerationMetrics:
     answer: str
+    answer_length: int
     prompt_tokens: int
     completion_tokens: int
     total_tokens: int
@@ -51,6 +64,10 @@ class GenerationMetrics:
 class OverallMetrics:
     total_latency: float
     total_cost: float
+    recall_at_k: Optional[float] = None
+    precision_at_k: Optional[float] = None
+    hit_rate: Optional[float] = None
+    mrr: Optional[float] = None
 
 @dataclass
 class EvaluationResult:
@@ -59,3 +76,4 @@ class EvaluationResult:
     pipeline_stages: list[PipelineStage]
     generation_metrics: GenerationMetrics
     overall_metrics: OverallMetrics
+    judge_evaluation: JudgeEvaluation

@@ -1,0 +1,1029 @@
+[
+  {
+    "id": 1,
+    "category": "concept",
+    "intent": "definition",
+    "difficulty": "easy",
+    "question": "What is ToolNode and what problem does it solve?",
+    "expected_files": [
+      "workflows-agents.mdx",
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "prebuilt/langgraph/prebuilt/tool_node.py"
+    ],
+    "concepts": [
+      "ToolNode",
+      "tool execution"
+    ]
+  },
+  {
+    "id": 2,
+    "category": "concept",
+    "intent": "definition",
+    "difficulty": "easy",
+    "question": "What is Send in LangGraph?",
+    "expected_files": [
+      "graph-api.mdx",
+      "workflows-agents.mdx",
+      "use-graph-api.mdx",
+      "langgraph/langgraph/types.py"
+    ],
+    "concepts": [
+      "Send",
+      "dynamic routing"
+    ]
+  },
+  {
+    "id": 3,
+    "category": "comparison",
+    "intent": "compare_features",
+    "difficulty": "medium",
+    "question": "What is the difference between StateGraph and MessageGraph?",
+    "expected_files": [
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "choosing-apis.mdx",
+      "langgraph/langgraph/graph/state.py",
+      "langgraph/langgraph/graph/message.py"
+    ],
+    "concepts": [
+      "StateGraph",
+      "MessageGraph",
+      "MessagesState"
+    ]
+  },
+  {
+    "id": 4,
+    "category": "comparison",
+    "intent": "compare_features",
+    "difficulty": "medium",
+    "question": "How do reducers differ from add_messages?",
+    "expected_files": [
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "langgraph/langgraph/graph/state.py",
+      "langgraph/langgraph/graph/message.py"
+    ],
+    "concepts": [
+      "reducers",
+      "add_messages",
+      "MessagesState"
+    ]
+  },
+  {
+    "id": 5,
+    "category": "comparison",
+    "intent": "compare_features",
+    "difficulty": "medium",
+    "question": "When should I use ToolNode instead of calling a tool directly?",
+    "expected_files": [
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "workflows-agents.mdx",
+      "thinking-in-langgraph.mdx",
+      "prebuilt/langgraph/prebuilt/tool_node.py"
+    ],
+    "concepts": [
+      "ToolNode",
+      "tool execution",
+      "tool calling"
+    ]
+  },
+  {
+    "id": 6,
+    "category": "implementation",
+    "intent": "implementation_workflow",
+    "difficulty": "medium",
+    "question": "How do I create a custom reducer in LangGraph?",
+    "expected_files": [
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "langgraph/langgraph/graph/state.py"
+    ],
+    "concepts": [
+      "reducers",
+      "StateGraph",
+      "state management"
+    ]
+  },
+  {
+    "id": 7,
+    "category": "implementation",
+    "intent": "implementation_workflow",
+    "difficulty": "medium",
+    "question": "How do I use ToolNode with custom tools?",
+    "expected_files": [
+      "graph-api.mdx",
+      "workflows-agents.mdx",
+      "use-graph-api.mdx",
+      "prebuilt/langgraph/prebuilt/tool_node.py"
+    ],
+    "concepts": [
+      "ToolNode",
+      "tool execution",
+      "tool calling"
+    ]
+  },
+  {
+    "id": 8,
+    "category": "implementation",
+    "intent": "implementation_workflow",
+    "difficulty": "medium",
+    "question": "How do I resume execution after an interrupt?",
+    "expected_files": [
+      "interrupts.mdx",
+      "persistence.mdx",
+      "checkpointers.mdx",
+      "checkpoint/langgraph/checkpoint/base/__init__.py"
+    ],
+    "concepts": [
+      "interrupts",
+      "checkpointing",
+      "graph execution"
+    ]
+  },
+  {
+    "id": 9,
+    "category": "implementation",
+    "intent": "implementation_workflow",
+    "difficulty": "medium",
+    "question": "How do I stream tool progress to a React application?",
+    "expected_files": [
+      "streaming.mdx",
+      "frontend/graph-execution.mdx",
+      "frontend/custom-stream-channels.mdx",
+      "prebuilt/langgraph/prebuilt/_tool_call_stream.py"
+    ],
+    "concepts": [
+      "streaming",
+      "tool execution",
+      "React integration"
+    ]
+  },
+  {
+    "id": 10,
+    "category": "implementation",
+    "intent": "implementation_workflow",
+    "difficulty": "hard",
+    "question": "How do I persist conversation state across multiple sessions?",
+    "expected_files": [
+      "persistence.mdx",
+      "checkpointers.mdx",
+      "add-memory.mdx",
+      "checkpoint/langgraph/checkpoint/base/__init__.py",
+      "checkpoint/langgraph/checkpoint/memory/__init__.py"
+    ],
+    "concepts": [
+      "checkpointing",
+      "persistent memory",
+      "conversation state"
+    ]
+  },
+  {
+    "id": 11,
+    "category": "reasoning",
+    "intent": "multi_document_reasoning",
+    "difficulty": "hard",
+    "question": "How does tool execution interact with checkpoints?",
+    "expected_files": [
+      "graph-api.mdx",
+      "checkpointers.mdx",
+      "persistence.mdx",
+      "workflows-agents.mdx",
+      "prebuilt/langgraph/prebuilt/tool_node.py",
+      "checkpoint/langgraph/checkpoint/base/__init__.py"
+    ],
+    "concepts": [
+      "ToolNode",
+      "tool execution",
+      "checkpointing",
+      "graph execution"
+    ]
+  },
+  {
+    "id": 12,
+    "category": "reasoning",
+    "intent": "multi_document_reasoning",
+    "difficulty": "hard",
+    "question": "How do streaming and checkpoints work together?",
+    "expected_files": [
+      "streaming.mdx",
+      "persistence.mdx",
+      "checkpointers.mdx",
+      "frontend/graph-execution.mdx",
+      "checkpoint/langgraph/checkpoint/base/__init__.py"
+    ],
+    "concepts": [
+      "streaming",
+      "checkpointing",
+      "graph execution"
+    ]
+  },
+  {
+    "id": 13,
+    "category": "reasoning",
+    "intent": "multi_document_reasoning",
+    "difficulty": "hard",
+    "question": "How do reducers affect parallel execution?",
+     "expected_files": [
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "langgraph/langgraph/graph/state.py",
+      "pregel.mdx"
+    ],
+    "concepts": [
+      "reducers",
+      "parallel execution",
+      "state management"
+    ]
+  },
+  {
+    "id": 14,
+    "category": "reasoning",
+    "intent": "multi_document_reasoning",
+    "difficulty": "hard",
+    "question": "Explain how state flows through a LangGraph execution.",
+    "expected_files": [
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "pregel.mdx",
+      "langgraph/langgraph/graph/state.py",
+      "langgraph/langgraph/pregel/main.py"
+    ],
+    "concepts": [
+      "StateGraph",
+      "graph execution",
+      "state management",
+      "reducers"
+  ]
+  },
+  {
+    "id": 15,
+    "category": "reasoning",
+    "intent": "multi_document_reasoning",
+    "difficulty": "hard",
+    "question": "How does LangGraph recover after an interrupted execution?",
+    "expected_files": [
+      "interrupts.mdx",
+      "persistence.mdx",
+      "checkpointers.mdx",
+      "langgraph/langgraph/pregel/_checkpoint.py",
+      "checkpoint/langgraph/checkpoint/base/__init__.py"
+    ],
+    "concepts": [
+      "interrupts",
+      "checkpointing",
+      "graph execution",
+      "human-in-the-loop"
+    ]
+  },
+  {
+    "id": 16,
+    "category": "navigation",
+    "intent": "document_lookup",
+    "difficulty": "easy",
+    "question": "Where is ToolNode documented?",
+    "expected_files": [
+      "workflows-agents.mdx",
+      "prebuilt/langgraph/prebuilt/tool_node.py"
+    ],
+    "concepts": [
+      "ToolNode"
+    ]
+  },
+  {
+    "id": 17,
+    "category": "navigation",
+    "intent": "document_lookup",
+    "difficulty": "easy",
+    "question": "Which page explains streaming in React?",
+    "expected_files": [
+      "frontend/graph-execution.mdx"
+    ],
+    "concepts": [
+      "React integration",
+      "streaming"
+    ]
+  },
+  {
+    "id": 18,
+    "category": "navigation",
+    "intent": "document_lookup",
+    "difficulty": "easy",
+    "question": "Where can I find examples of Command?",
+    "expected_files": [
+      "graph-api.mdx",
+      "use-graph-api.mdx"
+    ],
+    "concepts": [
+      "Command"
+    ]
+  },
+  {
+    "id": 19,
+    "category": "best_practices",
+    "intent": "design_guidelines",
+    "difficulty": "medium",
+    "question": "Should every LangGraph application use a checkpointer?",
+    "expected_files": [
+      "checkpointers.mdx",
+      "persistence.mdx",
+      "thinking-in-langgraph.mdx"
+    ],
+    "concepts": [
+      "checkpointing",
+      "persistent memory",
+      "design patterns"
+    ]
+  },
+  {
+    "id": 20,
+    "category": "best_practices",
+    "intent": "edge_case",
+    "difficulty": "hard",
+    "question": "What happens if a tool throws an exception during graph execution?",
+    "expected_files": [
+      "graph-api.mdx",
+      "errors/INVALID_GRAPH_NODE_RETURN_VALUE.mdx",
+      "fault-tolerance.mdx",
+      "prebuilt/langgraph/prebuilt/tool_node.py"
+    ],
+    "concepts": [
+      "ToolNode",
+      "tool execution",
+      "error handling",
+      "graph execution"
+    ]
+  },
+  {
+    "id": 21,
+    "category": "reasoning",
+    "intent": "workflow_design",
+    "difficulty": "hard",
+    "question": "How would you build a LangGraph workflow that pauses for human approval before executing a tool call and then resumes execution later?",
+    "expected_files": [
+      "interrupts.mdx",
+      "persistence.mdx",
+      "checkpointers.mdx",
+      "workflows-agents.mdx",
+      "prebuilt/langgraph/prebuilt/tool_node.py",
+      "checkpoint/langgraph/checkpoint/base/__init__.py"
+    ],
+    "concepts": [
+      "interrupts",
+      "human-in-the-loop",
+      "checkpointing",
+      "ToolNode",
+      "tool execution",
+      "workflow design"
+    ]
+  },
+  {
+    "id": 22,
+    "category": "reasoning",
+    "intent": "feature_integration",
+    "difficulty": "hard",
+    "question": "How do interrupts and checkpointers work together to enable human-in-the-loop workflows in LangGraph?",
+    "expected_files": [
+      "interrupts.mdx",
+      "checkpointers.mdx",
+      "persistence.mdx",
+      "checkpoint/langgraph/checkpoint/base/__init__.py"
+    ],
+    "concepts": [
+      "interrupts",
+      "checkpointing",
+      "human-in-the-loop",
+      "feature integration"
+    ]
+  },
+  {
+    "id": 23,
+    "category": "reasoning",
+    "intent": "multi_document",
+    "difficulty": "hard",
+    "question": "Explain how Send and reducers work together to implement a map-reduce pattern in LangGraph.",
+    "expected_files": [
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "langgraph/langgraph/types.py",
+      "langgraph/langgraph/graph/state.py"
+    ],
+    "concepts": [
+      "Send",
+      "reducers",
+      "map-reduce",
+      "parallel execution"
+    ]
+  },
+  {
+    "id": 24,
+    "category": "comparison",
+    "intent": "compare_features",
+    "difficulty": "hard",
+    "question": "When should you use Command instead of conditional edges in LangGraph?",
+    "expected_files": [
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "langgraph/langgraph/types.py"
+    ],
+    "concepts": [
+      "Command",
+      "conditional edges",
+      "control flow",
+      "workflow design"
+    ]
+  },
+  {
+    "id": 25,
+    "category": "reasoning",
+    "intent": "architecture",
+    "difficulty": "hard",
+    "question": "Design a LangGraph workflow that performs parallel tool execution and merges the results safely into shared state.",
+    "expected_files": [
+      "workflows-agents.mdx",
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "pregel.mdx",
+      "langgraph/langgraph/graph/state.py",
+      "prebuilt/langgraph/prebuilt/tool_node.py"
+    ],
+    "concepts": [
+      "workflow design",
+      "parallel execution",
+      "ToolNode",
+      "reducers",
+      "state management"
+    ]
+  },
+  {
+    "id": 26,
+    "category": "implementation",
+    "intent": "streaming",
+    "difficulty": "hard",
+    "question": "How does streaming interact with graph execution, and what information can be streamed at different stages of a LangGraph run?",
+    "expected_files": [
+      "streaming.mdx",
+      "event-streaming.mdx",
+      "frontend/graph-execution.mdx",
+      "pregel.mdx",
+      "langgraph/langgraph/pregel/main.py"
+    ],
+    "concepts": [
+      "streaming",
+      "graph execution",
+      "event streaming",
+      "execution lifecycle"
+    ]
+  },
+  {
+    "id": 27,
+    "category": "comparison",
+    "intent": "compare_features",
+    "difficulty": "hard",
+    "question": "Compare StateGraph, Functional API, and entrypoint workflows. When is each approach most appropriate?",
+    "expected_files": [
+      "choosing-apis.mdx",
+      "graph-api.mdx",
+      "functional-api.mdx",
+      "use-graph-api.mdx",
+      "use-functional-api.mdx"
+    ],
+    "concepts": [
+      "StateGraph",
+      "Functional API",
+      "entrypoint",
+      "API selection",
+      "workflow design"
+    ]
+  },
+  {
+    "id": 28,
+    "category": "implementation",
+    "intent": "memory",
+    "difficulty": "hard",
+    "question": "Explain the role of checkpointers in persistent memory and recovery during LangGraph execution.",
+    "expected_files": [
+      "checkpointers.mdx",
+      "persistence.mdx",
+      "add-memory.mdx",
+      "checkpoint/langgraph/checkpoint/base/__init__.py"
+    ],
+    "concepts": [
+      "checkpointing",
+      "persistent memory",
+      "recovery",
+      "graph execution"
+    ]
+  },
+  {
+    "id": 29,
+    "category": "reasoning",
+    "intent": "tool_execution",
+    "difficulty": "hard",
+    "question": "How does ToolNode simplify tool execution, and how does it interact with MessagesState in common agent workflows?",
+    "expected_files": [
+      "workflows-agents.mdx",
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "prebuilt/langgraph/prebuilt/tool_node.py",
+      "langgraph/langgraph/graph/message.py"
+    ],
+    "concepts": [
+      "ToolNode",
+      "MessagesState",
+      "tool execution",
+      "agent workflows"
+    ]
+  },
+  {
+    "id": 30,
+    "category": "reasoning",
+    "intent": "graph_execution",
+    "difficulty": "hard",
+    "question": "Describe the complete lifecycle of a LangGraph execution from graph invocation to reaching END.",
+    "expected_files": [
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "pregel.mdx",
+      "langgraph/langgraph/pregel/main.py",
+      "langgraph/langgraph/graph/state.py"
+    ],
+    "concepts": [
+      "graph execution",
+      "execution lifecycle",
+      "StateGraph",
+      "state management",
+      "Pregel"
+    ] 
+  },
+  {
+    "id": 31,
+    "category": "implementation",
+    "intent": "subgraphs",
+    "difficulty": "hard",
+    "question": "How can subgraphs be used to organize complex LangGraph applications, and how is state shared between parent and child graphs?",
+    "expected_files": [
+      "use-subgraphs.mdx",
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "langgraph/langgraph/graph/state.py"
+    ],
+    "concepts": [
+      "subgraphs",
+      "StateGraph",
+      "state management",
+      "graph composition"
+    ]
+  },
+  {
+    "id": 32,
+    "category": "comparison",
+    "intent": "execution_control",
+    "difficulty": "hard",
+    "question": "Compare Send, Command, and conditional edges. What problems does each solve in LangGraph?",
+    "expected_files": [
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "langgraph/langgraph/types.py"
+    ],
+    "concepts": [
+      "Send",
+      "Command",
+      "conditional edges",
+      "control flow"
+    ]
+  },
+  {
+    "id": 33,
+    "category": "reasoning",
+    "intent": "fault_tolerance",
+    "difficulty": "hard",
+    "question": "How would you design a fault-tolerant LangGraph workflow that can recover after interruption or failure without restarting from the beginning?",
+    "expected_files": [
+      "fault-tolerance.mdx",
+      "persistence.mdx",
+      "checkpointers.mdx",
+      "interrupts.mdx",
+      "checkpoint/langgraph/checkpoint/base/__init__.py"
+    ],
+    "concepts": [
+      "fault tolerance",
+      "checkpointing",
+      "recovery",
+      "interrupts",
+      "workflow design"
+    ]
+  },
+  {
+    "id": 34,
+    "category": "implementation",
+    "intent": "multi_agent",
+    "difficulty": "hard",
+    "question": "How can multiple agents be coordinated within a LangGraph workflow, and which graph features enable their communication?",
+    "expected_files": [
+      "workflows-agents.mdx",
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "langgraph/langgraph/types.py",
+      "langgraph/langgraph/graph/state.py"
+    ],
+    "concepts": [
+      "multi-agent",
+      "agent communication",
+      "StateGraph",
+      "Command",
+      "Send"
+    ]
+  },
+  {
+    "id": 35,
+    "category": "reasoning",
+    "intent": "state_management",
+    "difficulty": "hard",
+    "question": "Why are reducers important when multiple nodes update the same state concurrently?",
+    "expected_files": [
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "pregel.mdx",
+      "errors/INVALID_CONCURRENT_GRAPH_UPDATE.mdx",
+      "langgraph/langgraph/graph/state.py"
+    ],
+    "concepts": [
+      "reducers",
+      "state management",
+      "parallel execution",
+      "concurrent state updates"
+    ]
+  },
+  {
+    "id": 36,
+    "category": "comparison",
+    "intent": "messages",
+    "difficulty": "hard",
+    "question": "How does add_messages differ from writing a custom reducer, and when should each be used?",
+    "expected_files": [
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "langgraph/langgraph/graph/message.py",
+      "langgraph/langgraph/graph/state.py"
+    ],
+    "concepts": [
+      "add_messages",
+      "reducers",
+      "MessagesState",
+      "state management"
+    ]
+  },
+  {
+    "id": 37,
+    "category": "reasoning",
+    "intent": "event_streaming",
+    "difficulty": "hard",
+    "question": "How do event streaming and execution streaming differ, and what debugging scenarios does each support in LangGraph?",
+    "expected_files": [
+      "streaming.mdx",
+      "event-streaming.mdx",
+      "observability.mdx",
+      "frontend/graph-execution.mdx"
+    ],
+    "concepts": [
+      "execution streaming",
+      "event streaming",
+      "observability",
+      "debugging"
+    ]
+  },
+  {
+    "id": 38,
+    "category": "implementation",
+    "intent": "agent_design",
+    "difficulty": "hard",
+    "question": "Design an agentic RAG workflow in LangGraph that can decide whether to retrieve, rewrite the query, or answer directly.",
+    "expected_files": [
+      "agentic-rag.mdx",
+      "workflows-agents.mdx",
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "langgraph/langgraph/types.py"
+    ],
+    "concepts": [
+      "agentic RAG",
+      "workflow design",
+      "conditional routing",
+      "Command",
+      "StateGraph"
+    ]
+  },
+  {
+    "id": 39,
+    "category": "reasoning",
+    "intent": "execution_flow",
+    "difficulty": "hard",
+    "question": "How can conditional edges, Command, and Send be combined within the same LangGraph application to create dynamic execution flows?",
+    "expected_files": [
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "langgraph/langgraph/types.py"
+    ],
+    "concepts": [
+      "conditional edges",
+      "Command",
+      "Send",
+      "control flow",
+      "dynamic execution"
+    ]
+  },
+  {
+    "id": 40,
+    "category": "architecture",
+    "intent": "best_practices",
+    "difficulty": "hard",
+    "question": "What LangGraph features would you combine to build a production-ready, resilient, and observable AI workflow, and why?",
+    "expected_files": [
+      "thinking-in-langgraph.mdx",
+      "observability.mdx",
+      "fault-tolerance.mdx",
+      "persistence.mdx",
+      "checkpointers.mdx",
+      "streaming.mdx"
+    ],
+    "concepts": [
+      "workflow design",
+      "fault tolerance",
+      "observability",
+      "checkpointing",
+      "streaming",
+      "production architecture"
+    ]
+  },
+  {
+    "id": 41,
+    "category": "architecture",
+    "intent": "system_design",
+    "difficulty": "medium",
+    "question": "Design a customer support workflow that requires human approval before issuing refunds, streams progress to the UI, and can recover after a server restart. Explain which LangGraph features you would use and why.",
+    "expected_files": [
+      "interrupts.mdx",
+      "checkpointers.mdx",
+      "persistence.mdx",
+      "streaming.mdx",
+      "frontend/graph-execution.mdx",
+      "fault-tolerance.mdx"
+    ],
+    "concepts": [
+      "human-in-the-loop",
+      "checkpointing",
+      "persistent execution",
+      "streaming",
+      "fault tolerance",
+      "system design"
+    ]
+  },
+  {
+    "id": 42,
+    "category": "architecture",
+    "intent": "system_design",
+    "difficulty": "medium",
+    "question": "Design an Agentic RAG workflow that can decide whether to answer directly, retrieve additional information, rewrite the query, or escalate to a human reviewer. Explain the decision flow.",
+    "expected_files": [
+      "agentic-rag.mdx",
+      "workflows-agents.mdx",
+      "graph-api.mdx",
+      "interrupts.mdx",
+      "use-graph-api.mdx"
+    ],
+    "concepts": [
+      "agentic RAG",
+      "conditional routing",
+      "human-in-the-loop",
+      "workflow design",
+      "StateGraph"
+    ]
+  },
+  {
+    "id": 43,
+    "category": "architecture",
+    "intent": "multi_agent_system",
+    "difficulty": "hard",
+    "question": "Design a multi-agent research system where one agent plans, another retrieves information, a third summarizes findings, and a reviewer validates the final answer. Explain how the agents communicate and coordinate.",
+    "expected_files": [
+      "workflows-agents.mdx",
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "agentic-rag.mdx",
+      "interrupts.mdx",
+      "langgraph/langgraph/types.py"
+    ],
+    "concepts": [
+      "multi-agent",
+      "agent communication",
+      "workflow design",
+      "StateGraph",
+      "Command",
+      "human-in-the-loop"
+    ]
+  },
+  {
+    "id": 44,
+    "category": "architecture",
+    "intent": "parallel_processing",
+    "difficulty": "hard",
+    "question": "Design a LangGraph workflow that processes hundreds of documents in parallel and safely merges extracted information into shared state. Explain how you would prevent state conflicts.",
+    "expected_files": [
+      "graph-api.mdx",
+      "use-graph-api.mdx",
+      "pregel.mdx",
+      "errors/INVALID_CONCURRENT_GRAPH_UPDATE.mdx",
+      "langgraph/langgraph/types.py",
+      "langgraph/langgraph/graph/state.py"
+    ],
+    "concepts": [
+      "parallel execution",
+      "Send",
+      "reducers",
+      "state management",
+      "workflow design"
+    ]
+  },
+  {
+    "id": 45,
+    "category": "architecture",
+    "intent": "fault_tolerance",
+    "difficulty": "hard",
+    "question": "Design a long-running LangGraph application that executes for several hours, survives process crashes, and resumes execution from the exact point of interruption.",
+    "expected_files": [
+      "fault-tolerance.mdx",
+      "persistence.mdx",
+      "checkpointers.mdx",
+      "checkpoint/langgraph/checkpoint/base/__init__.py",
+      "langgraph/langgraph/pregel/_checkpoint.py"
+    ],
+    "concepts": [
+      "fault tolerance",
+      "checkpointing",
+      "persistent execution",
+      "recovery",
+      "long-running workflows"
+    ]
+  },
+  {
+    "id": 46,
+    "category": "architecture",
+    "intent": "ai_coding_assistant",
+    "difficulty": "hard",
+    "question": "Design an AI coding assistant capable of planning code changes, executing tools, requesting human approval before modifying code, and recovering from failed tool executions.",
+    "expected_files": [
+      "workflows-agents.mdx",
+      "interrupts.mdx",
+      "checkpointers.mdx",
+      "fault-tolerance.mdx",
+      "persistence.mdx",
+      "prebuilt/langgraph/prebuilt/tool_node.py"
+    ],
+    "concepts": [
+      "agent workflows",
+      "ToolNode",
+      "human-in-the-loop",
+      "checkpointing",
+      "fault tolerance",
+      "workflow design"
+    ]
+  },
+  {
+    "id": 47,
+    "category": "architecture",
+    "intent": "observability",
+    "difficulty": "hard",
+    "question": "Design a production-ready LangGraph workflow that provides detailed execution monitoring, debugging capabilities, and performance insights without significantly impacting runtime.",
+      "expected_files": [
+      "observability.mdx",
+      "streaming.mdx",
+      "event-streaming.mdx"
+    ],
+    "concepts": [
+      "observability",
+      "execution monitoring",
+      "debugging",
+      "performance monitoring",
+      "streaming"
+    ]
+  },
+  {
+    "id": 48,
+    "category": "architecture",
+    "intent": "financial_workflow",
+    "difficulty": "very_hard",
+    "question": "Design a workflow for processing financial transactions where failures must never result in duplicate execution, approvals are auditable, and interrupted executions can safely resume.",
+    "expected_files": [
+      "fault-tolerance.mdx",
+      "interrupts.mdx",
+      "checkpointers.mdx",
+      "persistence.mdx",
+      "checkpoint/langgraph/checkpoint/base/__init__.py",
+      "langgraph/langgraph/pregel/_checkpoint.py"
+    ],
+    "concepts": [
+      "fault tolerance",
+      "checkpointing",
+      "human-in-the-loop",
+      "persistent execution",
+      "workflow design",
+      "auditability"
+    ]
+  },
+  {
+    "id": 49,
+    "category": "architecture",
+    "intent": "scalability",
+    "difficulty": "very_hard",
+    "question": "Design a multi-tenant LangGraph platform that simultaneously serves thousands of users while isolating each user's workflow state, memory, and execution.",
+    "expected_files": [
+      "persistence.mdx",
+      "checkpointers.mdx",
+      "stores.mdx",
+      "add-memory.mdx",
+      "checkpoint/langgraph/checkpoint/base/__init__.py",
+      "checkpoint/langgraph/store/base/__init__.py"
+    ],
+    "concepts": [
+      "persistent execution",
+      "checkpointing",
+      "memory",
+      "stores",
+      "state management",
+      "multi-tenancy"
+    ]
+  },
+  {
+    "id": 50,
+    "category": "architecture",
+    "intent": "extensibility",
+    "difficulty": "very_hard",
+    "question": "Design a LangGraph application where developers can add new tools, agents, and workflows without modifying the existing graph structure. Explain how you would make the system extensible.",
+    "expected_files": [
+      "workflows-agents.mdx",
+      "graph-api.mdx",
+      "use-subgraphs.mdx",
+      "choosing-apis.mdx",
+      "prebuilt/langgraph/prebuilt/tool_node.py"
+    ],
+    "concepts": [
+      "workflow design",
+      "graph composition",
+      "subgraphs",
+      "ToolNode",
+      "extensibility"
+    ]
+  },
+  {
+    "id": 51,
+    "category": "architecture",
+    "intent": "low_latency",
+    "difficulty": "hard",
+    "question": "Design an AI assistant that begins streaming responses within one second while continuing background retrieval and tool execution when necessary. Explain how you would balance responsiveness and answer quality.",
+    "expected_files": [
+      "streaming.mdx",
+      "event-streaming.mdx",
+      "workflows-agents.mdx",
+      "graph-api.mdx",
+      "prebuilt/langgraph/prebuilt/tool_node.py"
+    ],
+    "concepts": [
+      "streaming",
+      "tool execution",
+      "workflow design",
+      "low latency",
+      "progressive execution"
+    ]
+  },
+  {
+    "id": 52,
+    "category": "architecture",
+    "intent": "enterprise_system_design",
+    "difficulty": "very_hard",
+    "question": "Design an enterprise AI workflow that combines multiple agents, human approvals, persistent memory, fault tolerance, streaming, and external tool execution. Explain the overall architecture and the role of each LangGraph feature.",
+    "expected_files": [
+      "workflows-agents.mdx",
+      "interrupts.mdx",
+      "persistence.mdx",
+      "checkpointers.mdx",
+      "fault-tolerance.mdx",
+      "streaming.mdx",
+      "observability.mdx",
+      "stores.mdx",
+      "add-memory.mdx",
+      "prebuilt/langgraph/prebuilt/tool_node.py"
+    ],
+    "concepts": [
+      "multi-agent",
+      "human-in-the-loop",
+      "persistent memory",
+      "checkpointing",
+      "fault tolerance",
+      "streaming",
+      "ToolNode",
+      "workflow design"
+    ]
+  }
+]
